@@ -23,7 +23,7 @@ const queryCache = new Map<string, Map<string, {
 const workersPool: Worker[] = [];
 
 async function loadWorker(data: DataFormat): Promise<Worker> {
-    const url = new URL("./sql/worker.js", import.meta.url);
+    const url = new URL("./sql/worker.ts", import.meta.url);
     const worker = new Worker(url.href, { type: "module" });
     return new Promise((resolve, reject) => {
         worker.onmessage = () => {

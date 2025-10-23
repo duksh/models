@@ -9,7 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "alasql": "^4.6.6",
+    "@sqlite.org/sqlite-wasm": "^3.50.4-build1",
     "astro": "^5.15.0"
   },
   "devDependencies": {

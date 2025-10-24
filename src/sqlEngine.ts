@@ -2,13 +2,6 @@ import type { DataFormat } from "./dataFormat";
 
 let loadedDataPromise: Promise<DataFormat> | null = null;
 
-async function loadData(): Promise<DataFormat> {
-    if (!loadedDataPromise) {
-        loadedDataPromise = fetch("/data.json").then((res) => res.json() as Promise<DataFormat>);
-    }
-    return loadedDataPromise;
-}
-
 /** Gets the name/ID for a model. */
 export function getModelIdsAndNames(data: DataFormat): {id: string; name: string }[] {
     return Object.entries(data.models).map(([modelId, modelData]) => ({
@@ -22,9 +15,8 @@ const queryCache = new Map<string, Map<string, {
 } | null>>();
 const workersPool: Worker[] = [];
 
-async function loadWorker(data: DataFormat): Promise<Worker> {
-    const url = new URL("./sql/worker.ts", import.meta.url);
-    const worker = new Worker(url.href, { type: "module" });
+async function loadWorker(): Promise<Worker> {
+    const worker = new Worker(new URL("./sql/worker.ts", import.meta.url), { type: "module" });
     return new Promise((resolve, reject) => {
         worker.onmessage = () => {
             worker.onmessage = null;
@@ -38,15 +30,14 @@ async function loadWorker(data: DataFormat): Promise<Worker> {
             reject(error);
         };
 
-        worker.postMessage(data);
+        worker.postMessage(null);
     });
 }
 
 async function initPool() {
-    const data = await loadData();
     const numWorkers = navigator.hardwareConcurrency || 4;
     for (let i = 0; i < numWorkers; i++) {
-        loadWorker(data).then((worker) => workersPool.push(worker));
+        loadWorker().then((worker) => workersPool.push(worker));
     }
 }
 
@@ -79,10 +70,8 @@ export async function loadSingleRow(query: string, modelId: string): Promise<{ [
         const timeout = setTimeout(() => {
             reject(new Error("SQL query timed out"));
             worker.terminate();
-            loadData().then((data) => {
-                loadWorker(data).then((newWorker) => {
-                    workersPool.push(newWorker);
-                });
+            loadWorker().then((newWorker) => {
+                workersPool.push(newWorker);
             });
         }, 1000);
 
@@ -106,10 +95,8 @@ export async function loadSingleRow(query: string, modelId: string): Promise<{ [
             clearTimeout(timeout);
             reject(error);
             worker.terminate();
-            loadData().then((data) => {
-                loadWorker(data).then((newWorker) => {
-                    workersPool.push(newWorker);
-                });
+            loadWorker().then((newWorker) => {
+                workersPool.push(newWorker);
             });
         };
 
@@ -124,10 +111,8 @@ export async function loadMultipleRows(query: string): Promise<{ [column: string
         const timeout = setTimeout(() => {
             reject(new Error("SQL query timed out"));
             worker.terminate();
-            loadData().then((data) => {
-                loadWorker(data).then((newWorker) => {
-                    workersPool.push(newWorker);
-                });
+            loadWorker().then((newWorker) => {
+                workersPool.push(newWorker);
             });
         }, 1000);
 
@@ -146,10 +131,8 @@ export async function loadMultipleRows(query: string): Promise<{ [column: string
             clearTimeout(timeout);
             reject(error);
             worker.terminate();
-            loadData().then((data) => {
-                loadWorker(data).then((newWorker) => {
-                    workersPool.push(newWorker);
-                });
+            loadWorker().then((newWorker) => {
+                workersPool.push(newWorker);
             });
         };
 

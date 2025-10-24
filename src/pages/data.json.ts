@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
 import type { DataFormat } from "../dataFormat";
 
+export const prerender = true;
+
 export const data: DataFormat = {
   vendors: {
     "openai": {

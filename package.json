@@ -10,14 +10,17 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.4.0",
-    "@sqlite.org/sqlite-wasm": "^3.50.4-build1",
     "@types/react-dom": "^19.2.2",
     "astro": "^5.15.0",
+    "better-sqlite3": "^12.4.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "sql.js": "^1.13.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/react": "^19.2.2",
+    "@types/sql.js": "^1.4.9",
     "js-tiktoken": "^1.0.21"
   }
 }

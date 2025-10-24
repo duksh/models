@@ -10,11 +10,11 @@ async function loadData(): Promise<DataFormat> {
 }
 
 /** Gets the name/ID for a model. */
-export async function getModelIdsAndNames(data: DataFormat): Promise<{ id: string; name: string }[]> {
+export function getModelIdsAndNames(data: DataFormat): {id: string; name: string }[] {
     return Object.entries(data.models).map(([modelId, modelData]) => ({
         id: modelId,
         name: modelData.cleanName,
-    }));
+    })).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 const queryCache = new Map<string, Map<string, {

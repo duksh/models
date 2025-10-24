@@ -9,10 +9,15 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/react": "^4.4.0",
     "@sqlite.org/sqlite-wasm": "^3.50.4-build1",
-    "astro": "^5.15.0"
+    "@types/react-dom": "^19.2.2",
+    "astro": "^5.15.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@types/react": "^19.2.2",
     "js-tiktoken": "^1.0.21"
   }
 }

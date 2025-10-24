@@ -1,13 +1,26 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/src/*": ["src/*"]
+      "@/src/*": [
+        "src/*"
+      ]
     },
-    "lib": ["ES2017", "WebWorker", "DOM"],
-    "module": "esnext"
+    "lib": [
+      "ES2017",
+      "WebWorker",
+      "DOM"
+    ],
+    "module": "esnext",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }

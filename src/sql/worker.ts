@@ -96,10 +96,11 @@ self.onmessage = async (event) => {
         loaded = true;
         const data = event.data;
         if (!sqlite3Db) {
-            sqlite3Db = new (await sqlite3({
+            const loadedSqlite3 = await sqlite3({
                 print: console.log,
                 printErr: console.error,
-            })).oo1.DB(":memory:");
+            });
+            sqlite3Db = new loadedSqlite3.oo1.DB(":memory:");
         }
         sqlite3Db.exec(schema);
         await loadData(data);
@@ -115,12 +116,14 @@ self.onmessage = async (event) => {
             compilationCache.set(query, prep);
         }
         prep.bind([param]);
-        const res = [];
         while (prep.step()) {
-            res.push(prep.get({}));
+            const row = prep.get({});
+            self.postMessage(row);
+            prep.reset();
+            return;
         }
         prep.reset();
-        self.postMessage(res[0] ?? null);
+        self.postMessage(null);
         return;
     }
 

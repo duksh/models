@@ -1,6 +1,7 @@
 import React from "react";
 import { defaultQueries } from "../constants";
 import { loadSingleRow } from "../sqlEngine";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 type ColumnDataType =
     "boolean" |
@@ -73,17 +74,17 @@ function SortingButtons({
         <div className="flex flex-col ml-1">
             <button
                 onClick={() => setSorting(ascending === true ? undefined : true)}
-                className={`text-[8px] leading-2 p-0 border-none bg-none cursor-pointer ${ascending === true ? "font-bold" : "font-normal"}`}
+                className="leading-2 p-0 border-none bg-none cursor-pointer"
                 aria-label="Sort ascending"
             >
-                ▲
+                <ArrowUp size={16} color={ascending === true ? "black" : "gray"} />
             </button>
             <button
                 onClick={() => setSorting(ascending === false ? undefined : false)}
-                className={`text-[8px] leading-2 p-0 border-none bg-none cursor-pointer ${ascending === false ? "font-bold" : "font-normal"}`}
+                className="leading-2 p-0 border-none bg-none cursor-pointer"
                 aria-label="Sort descending"
             >
-                ▼
+                <ArrowDown size={16} color={ascending === false ? "black" : "gray"} />
             </button>
         </div>
     );

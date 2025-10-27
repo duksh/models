@@ -48,6 +48,46 @@ function LoadingAffect() {
     );
 }
 
+function SortingButtons({
+    columnName,
+    query,
+    updateQuery,
+}: {
+    columnName: string;
+    query: ColumnQuery;
+    updateQuery: () => void;
+}) {
+    const ascending = query.columnOrdering[columnName];
+
+    const setSorting = (asc: boolean | undefined) => {
+        if (asc === undefined) {
+            delete query.columnOrdering[columnName];
+        } else {
+            query.columnOrdering[columnName] = asc;
+        }
+        updateQuery();
+    };
+
+    return (
+        <div style={{ display: "flex", flexDirection: "column", marginLeft: "4px" }}>
+            <button
+                onClick={() => setSorting(ascending === true ? undefined : true)}
+                style={{ fontSize: "8px", lineHeight: "8px", padding: "0", border: "none", background: "none", cursor: "pointer", fontWeight: ascending === true ? "bold" : "normal" }}
+                aria-label="Sort ascending"
+            >
+                ▲
+            </button>
+            <button
+                onClick={() => setSorting(ascending === false ? undefined : false)}
+                style={{ fontSize: "8px", lineHeight: "8px", padding: "0", border: "none", background: "none", cursor: "pointer", fontWeight: ascending === false ? "bold" : "normal" }}
+                aria-label="Sort descending"
+            >
+                ▼
+            </button>
+        </div>
+    );
+}
+
 function TableHeader({
     query,
     updateQuery,
@@ -67,10 +107,17 @@ function TableHeader({
         );
     }
 
-    // TODO: in the future add deletion/filtering/etc
+    // TODO: in the future add deletion/etc
     return queryColumns.map((col) => (
         <th key={col}>
-            {col}
+            <div style={{ display: "flex" }}>
+                {col}
+                <SortingButtons
+                    columnName={col}
+                    query={query}
+                    updateQuery={updateQuery}
+                />
+            </div>
         </th>
     ));
 }
@@ -227,22 +274,39 @@ function RowLoadedValues({
     });
 }
 
+const cachedQueriesKey = new WeakMap<ColumnQuery[], string>();
+
+function getQueriesKey(queries: ColumnQuery[]): string {
+    let key = cachedQueriesKey.get(queries);
+    if (!key) {
+        key = queries.map((q) => q.query + JSON.stringify(q.columnFilters)).join("||");
+        cachedQueriesKey.set(queries, key);
+    }
+    return key;
+}
+
+type LoadedValues = (any[] | null | { error: string })[] | null;
+
 function TableRow({
     id,
     name,
     queries,
     queryColumns,
     setQueryColumns,
+    loadedValues,
+    setLoadedValues,
 }: {
     id: string;
     name: string;
     queries: ColumnQuery[];
     queryColumns: (string[] | null)[];
     setQueryColumns: (cols: (string[] | null)[]) => void;
+    loadedValues: LoadedValues;
+    setLoadedValues: (vals: LoadedValues) => void;
 }) {
     const [rowVisible, setRowVisible] = React.useState(true);
-    const [loadedValues, setLoadedValues] = React.useState<(any[] | null | { error: string })[] | null>(null);
 
+    const queriesKey = getQueriesKey(queries);
     React.useEffect(() => {
         const mounted = [true] as [boolean];
         setLoadedValues(null);
@@ -262,7 +326,7 @@ function TableRow({
         return () => {
             mounted[0] = false;
         };
-    }, [id, queries]);
+    }, [id, queriesKey]);
 
     if (!rowVisible) {
         return null;
@@ -288,6 +352,77 @@ function TableRow({
     );
 }
 
+function sortValue(
+    aVal: any,
+    bVal: any,
+    ascending: boolean,
+    dataType: ColumnDataType | undefined,
+): number {
+    let comparison = 0;
+
+    if (dataType === "boolean") {
+        const aBool = Boolean(aVal);
+        const bBool = Boolean(bVal);
+        comparison = (aBool === bBool) ? 0 : (aBool ? 1 : -1);
+    } else if (typeof aVal === "number" && typeof bVal === "number") {
+        comparison = aVal - bVal;
+    } else {
+        const aStr = String(aVal);
+        const bStr = String(bVal);
+        comparison = aStr.localeCompare(bStr);
+    }
+
+    return ascending ? comparison : -comparison;
+}
+
+function sortIdsAndNames(
+    idsAndNames: { id: string; name: string }[],
+    queries: ColumnQuery[],
+    queryColumns: (string[] | null)[],
+    loadedValuesMap: Map<string, LoadedValues>,
+) {
+    return idsAndNames.slice().sort((a, b) => {
+        const aValues = loadedValuesMap.get(a.id);
+        const bValues = loadedValuesMap.get(b.id);
+
+        for (let i = 0; i < queries.length; i++) {
+            const queryOrdering = queries[i].columnOrdering;
+
+            for (const [colName, ascending] of Object.entries(queryOrdering)) {
+                const queryIdx = queryColumns[i]?.indexOf(colName);
+                if (queryIdx === undefined || queryIdx === -1) {
+                    continue;
+                }
+
+                const aQuery = aValues?.[i];
+                const bQuery = bValues?.[i];
+                if (!Array.isArray(aQuery)) {
+                    // Rank bQuery higher if it is valid, otherwise equal
+                    if (Array.isArray(bQuery)) {
+                        return ascending ? 1 : -1;
+                    }
+                    continue;
+                }
+
+                if (!Array.isArray(bQuery)) {
+                    // Rank aQuery higher
+                    return ascending ? -1 : 1;
+                }
+
+                const aVal = aQuery[queryIdx];
+                const bVal = bQuery[queryIdx];
+
+                const ranking = sortValue(aVal, bVal, ascending, queries[i].columnExplicitlySetDataTypes[colName]);
+                if (ranking !== 0) {
+                    return ranking;
+                }
+            }
+        }
+
+        return 0;
+    });
+}
+
 export default function Table({
     idsAndNames,
 }: {
@@ -298,6 +433,12 @@ export default function Table({
     const [queryColumns, setQueryColumns] = React.useState<(string[] | null)[]>(
         () => Array(queries.length).fill(null)
     );
+    const [loadedValuesRows, setLoadedValuesRows] = React.useState<[Map<string, LoadedValues>]>(
+        () => [new Map(idsAndNames.map(({ id }) => [id, null]))]
+    );
+    const sortedIdsAndNames = React.useMemo(() => {
+        return sortIdsAndNames(idsAndNames, queries, queryColumns, loadedValuesRows[0]);
+    }, [idsAndNames, queries, queryColumns, loadedValuesRows]);
 
     React.useEffect(() => {
         if (queries.length !== queryColumns.length) {
@@ -332,7 +473,7 @@ export default function Table({
             </thead>
             <tbody>
                 {
-                    idsAndNames.map(({ id, name }) => (
+                    sortedIdsAndNames.map(({ id, name }) => (
                         <TableRow
                             id={id}
                             key={id}
@@ -340,6 +481,13 @@ export default function Table({
                             queries={queries}
                             queryColumns={queryColumns}
                             setQueryColumns={setQueryColumns}
+                            loadedValues={loadedValuesRows[0].get(id)!}
+                            setLoadedValues={(vals) => {
+                                setLoadedValuesRows((prev) => {
+                                    prev[0].set(id, vals);
+                                    return [prev[0]];
+                                });
+                            }}
                         />
                     ))
                 }

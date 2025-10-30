@@ -105,6 +105,7 @@ const SQLModal = React.forwardRef<HTMLDialogElement, SQLModalProps>((props, ref)
             ref={ref}
             className="m-auto p-0 rounded-md max-w-lg"
             onClick={() => props.exit()}
+            onClose={() => props.exit()}
         >
             <div onClick={e => e.stopPropagation()}>
                 <div className="bg-white p-4 block w-full h-full">

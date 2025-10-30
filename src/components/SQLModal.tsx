@@ -46,9 +46,7 @@ function SQLModalInner({
     firstId,
 }: SQLModalProps) {
     const valueRef = React.useRef<string>("");
-    const [columnCustomTypes, setColumnCustomTypes] = React.useState<[{
-        [key: string]: ColumnDataType;
-    }]>([{}]);
+    const columnCustomTypes = React.useRef<{ [key: string]: ColumnDataType }>({});
     const [output, setOutput] = React.useState<React.JSX.Element | null>(null);
 
     const submit = React.useCallback((e: React.FormEvent) => {
@@ -63,7 +61,7 @@ function SQLModalInner({
                 ...prev,
                 {
                     query: valueRef.current,
-                    columnExplicitlySetDataTypes: columnCustomTypes[0],
+                    columnExplicitlySetDataTypes: columnCustomTypes.current,
                     columnFilters: {},
                     columnOrdering: {},
                 },
@@ -85,8 +83,7 @@ function SQLModalInner({
                 />
             </React.Suspense>
             <ColumnCustomTypeSelector
-                columnCustomTypesPtr={columnCustomTypes}
-                setColumnCustomTypes={(newTypes) => setColumnCustomTypes([newTypes])}
+                columnCustomTypes={columnCustomTypes.current}
             />
             <p className="mt-4">
                 Define the SQL query you would like to use to get column data. The first parameter

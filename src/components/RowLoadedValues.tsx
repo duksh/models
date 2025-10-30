@@ -49,7 +49,7 @@ export default function RowLoadedValues({
         } else if (Array.isArray(val)) {
             let res = val.map((cellVal, j) => (
                 <Column
-                    columnType="td" initialWidth={queries[i].widths?.[queryColumns[i]?.[j] || ""] || DEFAULT_COLUMN_WIDTH}
+                    columnType="td" initialWidth={queries[i]?.widths?.[queryColumns[i]?.[j] || ""] || DEFAULT_COLUMN_WIDTH}
                     updateWidth={(newWidth: number) => {
                         const colName = queryColumns[i]?.[j];
                         if (colName) {

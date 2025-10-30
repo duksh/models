@@ -1,20 +1,8 @@
 import React from "react";
-import { defaultQueries } from "../constants";
 import type { ColumnQuery } from "./Table";
 import { ToolCase, Warehouse, Wrench } from "lucide-react";
 import SQLModal from "./SQLModal";
-
-function DefaultSelector({
-    queries,
-    setQueries,
-    exit,
-}: {
-    queries: ColumnQuery[];
-    setQueries: (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => void;
-    exit: () => void;
-}) {
-    return null;
-}
+import DefaultSelector from "./DefaultSelector";
 
 function VendorSelector({
     queries,
@@ -55,18 +43,17 @@ function SelectionMode({
     switch (mode) {
         case "default":
             return (
-                <div className="flex rounded-md bg-gray-50 mt-2">
+                <div className="flex">
                     {closer}
                     <DefaultSelector
                         queries={queries}
                         setQueries={setQueries}
-                        exit={exit}
                     />
                 </div>
             );
         case "vendor":
             return (
-                <div className="flex rounded-md bg-gray-50 mt-2">
+                <div className="flex">
                     {closer}
                     <VendorSelector
                         queries={queries}
@@ -78,7 +65,7 @@ function SelectionMode({
     }
 
     return (
-        <div className="flex rounded-md bg-gray-50 mt-2">
+        <div className="flex mt-2">
             <SQLModal
                 ref={modalRef}
                 setQueries={setQueries}

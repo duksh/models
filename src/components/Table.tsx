@@ -93,7 +93,7 @@ function QueryFilter({
     return null;
 }
 
-type LoadedValues = (any[] | null | { error: string })[] | null;
+export type LoadedValues = (any[] | null | { error: string })[] | null;
 
 function TableHeader({
     query,
@@ -272,8 +272,8 @@ function TableRow({
     setQueries: (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => void;
     queryColumns: (string[] | null)[];
     setQueryColumns: (cols: (string[] | null)[]) => void;
-    loadedValues: LoadedValues;
-    setLoadedValues: (vals: LoadedValues) => void;
+    loadedValues: LoadedValues | null;
+    setLoadedValues: (vals: LoadedValues | null) => void;
 }) {
     const [rowVisible, setRowVisible] = React.useState(true);
 
@@ -300,7 +300,7 @@ function TableRow({
 
     const updateQueries = React.useCallback(() => {
         setQueries((prev) => [...prev]);
-    }, [setQueries]);
+    }, []);
 
     if (!rowVisible) {
         return null;
@@ -382,14 +382,41 @@ function sortIdsAndNames(
     });
 }
 
+// Deeply cursed component to update during render if needed.
+function useDynamicState<T>(
+    initialValue: T, updateIf: (value: T) => T | null,
+): [T, (value: T) => void] {
+    const stateRef = React.useRef(initialValue);
+    const [, forceUpdate] = React.useState(0);
+
+    const setState = React.useCallback((newValue: T) => {
+        stateRef.current = newValue;
+        forceUpdate((v) => v + 1);
+    }, []);
+
+    const res = updateIf(stateRef.current);
+    if (res !== null) {
+        stateRef.current = res;
+        return [res, setState];
+    }
+
+    return [stateRef.current, setState];
+}
+
 export default function Table({
     idsAndNames,
 }: {
     idsAndNames: { id: string; name: string }[];
 }) {
     const [queries, setQueries] = useLocalStorage<ColumnQuery[]>("table-queries", defaults);
-    const [queryColumns, setQueryColumns] = React.useState<(string[] | null)[]>(
-        () => Array(queries.length).fill(null)
+    const [queryColumns, setQueryColumns] = useDynamicState<(string[] | null)[]>(
+        Array(queries.length).fill(null),
+        (cols) => {
+            if (cols.length !== queries.length) {
+                return Array(queries.length).fill(null);
+            }
+            return null;
+        },
     );
     const [loadedValuesRows, setLoadedValuesRows] = React.useState<[Map<string, LoadedValues>]>(
         () => [new Map(idsAndNames.map(({ id }) => [id, null]))]
@@ -397,12 +424,6 @@ export default function Table({
     const sortedIdsAndNames = React.useMemo(() => {
         return sortIdsAndNames(idsAndNames, queries, queryColumns, loadedValuesRows[0]);
     }, [idsAndNames, queries, queryColumns, loadedValuesRows]);
-
-    React.useEffect(() => {
-        if (queries.length !== queryColumns.length) {
-            setQueryColumns(Array(queries.length).fill(null));
-        }
-    }, [queries, queryColumns.length]);
 
     return (
         <div className="overflow-scroll flex gap-4">
@@ -429,6 +450,13 @@ export default function Table({
                                         setQueries(newQueries);
                                     }}
                                     deleteQuery={() => {
+                                        // Handle the map
+                                        loadedValuesRows[0].forEach((v) => {
+                                            v?.splice(i, 1);
+                                        });
+                                        setLoadedValuesRows([...loadedValuesRows]);
+
+                                        // Handle deletion of a query from that array
                                         const newQueries = queries.filter((_, idx) => idx !== i);
                                         setQueries(newQueries);
                                     }}
@@ -450,7 +478,7 @@ export default function Table({
                                 setQueries={setQueries}
                                 queryColumns={queryColumns}
                                 setQueryColumns={setQueryColumns}
-                                loadedValues={loadedValuesRows[0].get(id)!}
+                                loadedValues={loadedValuesRows[0].get(id) || null}
                                 setLoadedValues={(vals) => {
                                     setLoadedValuesRows((prev) => {
                                         prev[0].set(id, vals);
@@ -466,6 +494,7 @@ export default function Table({
                 <AddButton
                     queries={queries}
                     setQueries={setQueries}
+                    loadedValuesRows={loadedValuesRows[0]}
                     firstId={idsAndNames[0]?.id || ""}
                 />
             </div>

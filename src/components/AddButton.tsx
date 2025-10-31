@@ -1,5 +1,5 @@
 import React from "react";
-import type { ColumnQuery } from "./Table";
+import type { ColumnQuery, LoadedValues } from "./Table";
 import { ToolCase, Warehouse, Wrench } from "lucide-react";
 import SQLModal from "./SQLModal";
 import DefaultSelector from "./DefaultSelector";
@@ -21,11 +21,13 @@ function SelectionMode({
     setQueries,
     exit,
     firstId,
+    loadedValuesRows,
 }: {
     queries: ColumnQuery[];
     setQueries: (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => void;
     exit: () => void;
     firstId: string;
+    loadedValuesRows: Map<string, LoadedValues>;
 }) {
     const [mode, setMode] = React.useState<null | "default" | "vendor">(null);
     const modalRef = React.useRef<HTMLDialogElement>(null);
@@ -40,6 +42,14 @@ function SelectionMode({
         </button>
     );
 
+    const setQueriesAndPurgeLoadedValues = React.useCallback(
+        (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => {
+            loadedValuesRows.clear();
+            setQueries(cb);
+        },
+        [setQueries, loadedValuesRows],
+    );
+
     switch (mode) {
         case "default":
             return (
@@ -47,7 +57,7 @@ function SelectionMode({
                     {closer}
                     <DefaultSelector
                         queries={queries}
-                        setQueries={setQueries}
+                        setQueries={setQueriesAndPurgeLoadedValues}
                     />
                 </div>
             );
@@ -57,7 +67,7 @@ function SelectionMode({
                     {closer}
                     <VendorSelector
                         queries={queries}
-                        setQueries={setQueries}
+                        setQueries={setQueriesAndPurgeLoadedValues}
                         exit={exit}
                     />
                 </div>
@@ -68,7 +78,7 @@ function SelectionMode({
         <div className="flex mt-2">
             <SQLModal
                 ref={modalRef}
-                setQueries={setQueries}
+                setQueries={setQueriesAndPurgeLoadedValues}
                 exit={exit}
                 firstId={firstId}
             />
@@ -110,10 +120,12 @@ export default function AddButton({
     queries,
     setQueries,
     firstId,
+    loadedValuesRows,
 }: {
     queries: ColumnQuery[];
     setQueries: (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => void;
     firstId: string;
+    loadedValuesRows: Map<string, LoadedValues>;
 }) {
     const [selectionMode, setSelectionMode] = React.useState(false);
 
@@ -131,6 +143,7 @@ export default function AddButton({
             <SelectionMode
                 queries={queries}
                 setQueries={setQueries}
+                loadedValuesRows={loadedValuesRows}
                 exit={() => setSelectionMode(false)}
                 firstId={firstId}
             />

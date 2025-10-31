@@ -26,11 +26,14 @@ export default function DefaultSelector({
                 );
             } else {
                 // Checked
-                setQueries((prev) => [...prev, {
-                    ...dq,
-                    columnFilters: {},
-                    columnOrdering: {},
-                }]);
+                setQueries((prev) => {
+                    const filter = prev.filter((q) => q.query !== dq.query);
+                    return [...filter, {
+                        ...dq,
+                        columnFilters: {},
+                        columnOrdering: {},
+                    }];
+                });
             }
         },
         [checkedQueries],

@@ -13,9 +13,16 @@ export default function useLocalStorage<T>(key: string, initialValue: T): [T, (v
     }, [key, initialValue]);
 
     const setValue = React.useCallback((value: T | ((prev: T) => T)) => {
-        const valueToStore = value instanceof Function ? value(storedValue) : value;
-        setStoredValue(valueToStore);
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        if (value instanceof Function) {
+            setStoredValue((prev) => {
+                const valueToStore = value(prev);
+                window.localStorage.setItem(key, JSON.stringify(valueToStore));
+                return valueToStore;
+            });
+            return;
+        }
+        setStoredValue(value);
+        window.localStorage.setItem(key, JSON.stringify(value));
     }, [key]);
 
     return [storedValue, setValue];

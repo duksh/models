@@ -78,7 +78,7 @@ export default function RowLoadedValues({
             for (let k = 0; k < emptyCells; k++) {
                 res.push(
                     <td key={`${i}-empty-${k}`}>
-                        {/* Empty */}
+                        TODO: infer column name from everything else
                     </td>
                 );
             }

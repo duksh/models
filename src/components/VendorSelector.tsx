@@ -27,13 +27,14 @@ function vendorOnlySelectAsWrapper(niceName: string, key: string, explicitDataTy
             niceNameReplaced = niceName.replace("?", vendorName);
         }
         let vendorQueryPart = "";
+        let innerKey = key;
         if (vendorSlug === null) {
-            key = `AVG(${key})`;
+            innerKey = `AVG(${key})`;
         } else {
             vendorQueryPart = `vendor_id = '${vendorSlug}' AND `;
         }
         return [
-            `SELECT ${key} AS \`${niceNameReplaced}\` FROM models_vendors WHERE ${vendorQueryPart}model_id = ?`,
+            `SELECT ${innerKey} AS \`${niceNameReplaced}\` FROM models_vendors WHERE ${vendorQueryPart}model_id = ?`,
             explicitDataType ? { [niceNameReplaced]: explicitDataType } : {},
         ] as [string, { [key: string]: ColumnDataType }];
     };

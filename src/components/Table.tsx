@@ -450,7 +450,7 @@ export default function Table({
     }, [idsAndNames, queries, queryColumns, loadedValuesRows]);
 
     return (
-        <div className="flex-1 overflow-x-auto">
+        <div className="flex-1 overflow-x-auto h-full">
             <div className="flex items-start min-w-max">
                 <table className="h-full">
                     <thead>

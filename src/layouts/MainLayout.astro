@@ -1,0 +1,42 @@
+---
+import { ClientRouter } from "astro:transitions";
+import Header from "../components/Header.astro";
+import "../styles/global.css";
+
+interface Props {
+    titleExtra?: string;
+    description?: string;
+}
+
+let { titleExtra, description } = Astro.props;
+
+const title = titleExtra ? `${titleExtra} - models.vantage.sh` : "models.vantage.sh";
+
+if (!description) {
+    description =
+        "models.vantage.sh is an open-source platform for getting information about AI models.";
+}
+---
+
+<html lang="en" transition:animate="none">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <link rel="icon" href="/favicon.png" />
+        <ClientRouter />
+        <slot name="head" />
+    </head>
+
+    <body>
+        <Header />
+        <main class="h-[calc(100vh-4rem)] overflow-auto">
+            <slot />
+        </main>
+    </body>
+</html>

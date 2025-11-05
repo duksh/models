@@ -1,22 +1,13 @@
 ---
 import Table from '../components/Table';
 import { getModelIdsAndNames } from '../sqlEngine';
-import { data } from "./data.json"
-
-import "../styles/global.css";
+import { data } from "./data.json";
+import MainLayout from '../layouts/MainLayout.astro';
 
 // Get the models for the server-side
 const models = getModelIdsAndNames(data);
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SQL Engine Demo</title>
-  </head>
-  <body>
-      <Table idsAndNames={models} vendors={data.vendors} client:load />
-  </body>
-</html>
+<MainLayout>
+    <Table idsAndNames={models} vendors={data.vendors} client:load />
+</MainLayout>

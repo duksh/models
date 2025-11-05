@@ -45,7 +45,7 @@ function SelectionMode({
     switch (mode) {
         case "default":
             return (
-                <div className="flex">
+                <div className="flex mr-2">
                     {closer}
                     <DefaultSelector
                         queries={queries}
@@ -55,7 +55,7 @@ function SelectionMode({
             );
         case "vendor":
             return (
-                <div className="flex">
+                <div className="flex mr-2">
                     {closer}
                     <VendorSelector
                         setQueries={setQueriesAndPurgeLoadedValues}
@@ -67,7 +67,7 @@ function SelectionMode({
     }
 
     return (
-        <div className="flex mt-2">
+        <div className="flex mt-2 mr-2">
             <SQLModal
                 ref={modalRef}
                 setQueries={setQueriesAndPurgeLoadedValues}
@@ -125,7 +125,7 @@ export default function AddButton({
 
     let innerContent = (
         <button
-            className="py-1 px-2 mt-2 border border-gray-400 rounded hover:bg-gray-200"
+            className="py-1 px-2 mt-2 mr-2 border border-gray-400 rounded hover:bg-gray-200"
             onClick={() => setSelectionMode(true)}
         >
             + Add Query

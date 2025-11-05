@@ -145,7 +145,10 @@ function VendorItems({
     setQueries: (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => void;
     exit: () => void;
 }) {
-    const vendorInfo = vendors[vendorSlug];
+    let vendorInfo: VendorInfo | null = null;
+    if (vendorSlug) {
+        vendorInfo = vendors[vendorSlug];
+    }
     const [queryBuilderIndex, setQueryBuilderIndex] = React.useState<number>(-1);
     const [region, setRegion] = React.useState<string | { eu: true } | null>(null);
     const [disabled, setDisabled] = React.useState(true);
@@ -163,9 +166,9 @@ function VendorItems({
         const builder = vendorQueryBuilders[queryBuilderIndex];
         let queryAndTypes: [string, { [key: string]: ColumnDataType }];
         if (builder.region) {
-            queryAndTypes = builder.queryBuilder(vendorSlug, vendorInfo.cleanName, region);
+            queryAndTypes = builder.queryBuilder(vendorSlug || null, vendorInfo?.cleanName ?? null, region);
         } else {
-            queryAndTypes = builder.queryBuilder(vendorSlug, vendorInfo.cleanName);
+            queryAndTypes = builder.queryBuilder(vendorSlug || null, vendorInfo?.cleanName ?? null);
         }
 
         setQueries((prev) => [
@@ -220,7 +223,7 @@ function VendorItems({
                     >
                         <option value="">All Regions (Average)</option>
                         {
-                            Object.entries(vendorInfo.regionCleanNames).map(([category, regions]) => {
+                            Object.entries(vendorInfo?.regionCleanNames || {}).map(([category, regions]) => {
                                 const child = Object.entries(regions).map(([regionCode, regionName]) => (
                                     <option key={regionCode} value={regionCode}>
                                         {regionName}
@@ -236,7 +239,7 @@ function VendorItems({
                                 );
                             })
                         }
-                        {vendorInfo.euOrUKRegions.length > 0 && (
+                        {!vendorInfo || vendorInfo.euOrUKRegions.length > 0 && (
                             <option value="eu">
                                 EU / UK Regions (Average)
                             </option>
@@ -279,7 +282,7 @@ export default function VendorSelector({
                 autoComplete="off"
             >
                 <option value="" disabled>
-                    Select a vendor
+                    All Vendors
                 </option>
                 {Object.entries(vendors).map(([slug, info]) => (
                     <option key={slug} value={slug}>
@@ -287,14 +290,12 @@ export default function VendorSelector({
                     </option>
                 ))}
             </select>
-            {selectedVendorSlug && (
-                <VendorItems
-                    vendors={vendors}
-                    vendorSlug={selectedVendorSlug}
-                    setQueries={setQueries}
-                    exit={exit}
-                />
-            )}
+            <VendorItems
+                vendors={vendors}
+                vendorSlug={selectedVendorSlug}
+                setQueries={setQueries}
+                exit={exit}
+            />
         </div>
     )
 }

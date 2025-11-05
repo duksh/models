@@ -198,7 +198,7 @@ function VendorItems({
                         className="w-full p-2 border rounded-md"
                         autoComplete="off"
                     >
-                        <option value="">No Region</option>
+                        <option value="">All Regions (Average)</option>
                         {
                             Object.entries(vendorInfo.regionCleanNames).map(([category, regions]) => {
                                 const child = Object.entries(regions).map(([regionCode, regionName]) => (
@@ -218,7 +218,7 @@ function VendorItems({
                         }
                         {vendorInfo.euOrUKRegions.length > 0 && (
                             <option value="eu">
-                                EU / UK Regions
+                                EU / UK Regions (Average)
                             </option>
                         )}
                     </select>

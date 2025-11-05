@@ -17,7 +17,8 @@ import type { VendorInfo } from "../dataFormat";
 
 export type ColumnDataType =
     "boolean" |
-    "currency";
+    "currency" |
+    "country";
 
 export type ColumnQuery = {
     query: string;

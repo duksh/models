@@ -18,6 +18,10 @@ function renderColumn(
             // TODO
             return cellVal;
         }
+        if (dataType === "country") {
+            // TODO
+            return cellVal;
+        }
     }
 
     return String(cellVal);

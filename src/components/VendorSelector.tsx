@@ -6,23 +6,34 @@ type VendorQueryBuilder = {
     name: string;
 } & ({
     region: true;
-    queryBuilder: (vendorSlug: string, vendorName: string, region: null | string | { eu: true }) => [
+    queryBuilder: (vendorSlug: string | null, vendorName: string | null, region: null | string | { eu: true }) => [
         string,
         { [key: string]: ColumnDataType },
     ];
 } | {
     region: false;
-    queryBuilder: (vendorSlug: string, vendorName: string) => [
+    queryBuilder: (vendorSlug: string | null, vendorName: string | null) => [
         string,
         { [key: string]: ColumnDataType },
     ];
 });
 
 function vendorOnlySelectAsWrapper(niceName: string, key: string, explicitDataType?: ColumnDataType) {
-    return (vendorSlug: string, vendorName: string) => {
-        const niceNameReplaced = niceName.replace("?", vendorName);
+    return (vendorSlug: string | null, vendorName: string | null) => {
+        let niceNameReplaced: string;
+        if (vendorName === null) {
+            niceNameReplaced = niceName.replace("?", "Average");
+        } else {
+            niceNameReplaced = niceName.replace("?", vendorName);
+        }
+        let vendorQueryPart = "";
+        if (vendorSlug === null) {
+            key = `AVG(${key})`;
+        } else {
+            vendorQueryPart = `vendor_id = '${vendorSlug}' AND `;
+        }
         return [
-            `SELECT ${key} AS \`${niceNameReplaced}\` FROM models_vendors WHERE vendor_id = '${vendorSlug}' AND model_id = ?`,
+            `SELECT ${key} AS \`${niceNameReplaced}\` FROM models_vendors WHERE ${vendorQueryPart}model_id = ?`,
             explicitDataType ? { [niceNameReplaced]: explicitDataType } : {},
         ] as [string, { [key: string]: ColumnDataType }];
     };
@@ -34,8 +45,8 @@ function vendorAndRegionSelectAsWrapper(
     explicitDataType?: ColumnDataType,
 ) {
     return (
-        vendorSlug: string,
-        vendorName: string,
+        vendorSlug: string | null,
+        vendorName: string | null,
         region: null | string | { eu: true },
     ) => {
         let formatted: string;
@@ -46,25 +57,34 @@ function vendorAndRegionSelectAsWrapper(
         } else {
             formatted = "EU / UK Regions";
         }
-        const niceNameReplaced = niceName.replace("?", vendorName + " " + formatted);
+        let niceNameReplaced: string;
+        if (vendorName === null) {
+            niceNameReplaced = niceName.replace("?", formatted);
+        } else {
+            niceNameReplaced = niceName.replace("?", vendorName + " " + formatted);
+        }
 
         const explicitDataTypes = explicitDataType
             ? { [niceNameReplaced]: explicitDataType }
             : {};
 
         let query: string;
+        let vendorIdQueryPart = "";
+        if (vendorSlug !== null) {
+            vendorIdQueryPart = `models_vendors_regions.vendor_id = '${vendorSlug}' AND `;
+        }
         if (region === null) {
             query = `SELECT AVG(${key}) AS \`${niceNameReplaced}\`
     FROM models_vendors_regions
-    WHERE vendor_id = '${vendorSlug}' AND model_id = ?`;
+    WHERE ${vendorIdQueryPart}model_id = ?`;
         } else if (typeof region === "string") {
             query = `SELECT ${key} AS \`${niceNameReplaced}\`
     FROM models_vendors_regions
-    WHERE vendor_id = '${vendorSlug}' AND model_id = ? AND region_code = '${region}'`;
+    WHERE ${vendorIdQueryPart}model_id = ? AND region_code = '${region}'`;
         } else if (region.eu) {
             query = `SELECT AVG(models_vendors_regions.${key}) AS \`${niceNameReplaced}\`
     FROM models_vendors_regions JOIN vendors ON models_vendors_regions.vendor_id = vendors.vendor_id
-    WHERE models_vendors_regions.vendor_id = '${vendorSlug}' AND models_vendors_regions.model_id = ? AND EXISTS (
+    WHERE ${vendorIdQueryPart}models_vendors_regions.model_id = ? AND EXISTS (
         SELECT 1 FROM json_each(vendors.eu_or_uk_regions) WHERE value = models_vendors_regions.region_code
     )`;
         } else {

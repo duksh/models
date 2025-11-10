@@ -282,7 +282,7 @@ export default function VendorSelector({
                 className="w-full p-2 border rounded-md mb-4"
                 autoComplete="off"
             >
-                <option value="" disabled>
+                <option value="">
                     All Vendors
                 </option>
                 {Object.entries(vendors).map(([slug, info]) => (

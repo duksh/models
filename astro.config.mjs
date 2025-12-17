@@ -8,12 +8,8 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   vite: {
-    optimizeDeps: {
-      exclude: ['@sqlite.org/sqlite-wasm'],
-    },
-
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
   },
-
-  integrations: [react()]
+  prefetch: true,
+  integrations: [react()],
 });

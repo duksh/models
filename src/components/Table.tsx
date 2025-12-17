@@ -13,6 +13,7 @@ import AddButton from "./AddButton";
 import SQLEditorButton from "./SQLEditorButton";
 import type { VendorInfo } from "../dataFormat";
 import { useStateItem } from "../state";
+import Link from "./Link";
 
 export type ColumnDataType =
     "boolean" |
@@ -314,7 +315,7 @@ function TableRow({
         <tr className="border-t border-gray-300">
             <td className="relative">
                 <div className="px-2">
-                    {name}
+                    <Link href={`/models/${id}`}>{name}</Link>
                 </div>
                 <div 
                     className="absolute top-0 right-0 w-1 h-full bg-gray-200 hover:opacity-50 transition-all duration-150" 

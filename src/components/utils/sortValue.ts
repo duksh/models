@@ -8,13 +8,12 @@ export default function sortValue(
 ): number {
     let comparison = 0;
 
+    // Null values are always at the end
     if (aVal === null) {
-        // Null is less than anything else
-        return ascending ? -1 : 1;
+        return 1;
     }
     if (bVal === null) {
-        // Null is less than anything else
-        return ascending ? 1 : -1;
+        return -1;
     }
 
     if (dataType === "boolean") {

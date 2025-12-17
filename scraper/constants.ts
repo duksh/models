@@ -364,7 +364,7 @@ export async function addBenchmarkDataForModel(modelId: string): Promise<{
     // Humanity's Last Exam
     const hleEntry = hleScores.find((entry) => entry.model_id.toLowerCase().startsWith(modelId.toLowerCase()));
     if (hleEntry) {
-        result.humanitysLastExamPercentage = hleEntry.score;
+        result.humanitysLastExamPercentage = hleEntry.score * 100;
     }
 
     return result;

@@ -5,6 +5,8 @@ import { useStateItem } from "../state";
 
 export const DEFAULT_COLUMN_WIDTH = 150;
 
+const ZERO_ENDING_REGEX = /0+$/g;
+
 function renderColumn(
     cellVal: any,
     columnName: string | undefined,
@@ -30,6 +32,12 @@ function renderColumn(
 
     if (cellVal === null) {
         return "-";
+    }
+
+    if (typeof cellVal === "number") {
+        // Round to 4 decimal places
+        const v = cellVal.toFixed(4);
+        return v.replace(ZERO_ENDING_REGEX, "");
     }
 
     return String(cellVal);

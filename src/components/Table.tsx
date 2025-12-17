@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { loadSingleRow } from "../sqlEngine";
 import BooleanFilter from "./filters/BooleanFilter";
 import StringFilter from "./filters/StringFilter";
@@ -306,10 +306,6 @@ function TableRow({
         };
     }, [id, queriesKey]);
 
-    const updateQueries = React.useCallback(() => {
-        setQueries((prev) => [...prev]);
-    }, []);
-
     if (!rowVisible) {
         return null;
     }
@@ -388,27 +384,6 @@ function sortIdsAndNames(
     });
 }
 
-// Deeply cursed component to update during render if needed.
-function useDynamicState<T>(
-    initialValue: T, updateIf: (value: T) => T | null,
-): [T, (value: T) => void] {
-    const stateRef = React.useRef(initialValue);
-    const [, forceUpdate] = React.useState(0);
-
-    const setState = React.useCallback((newValue: T) => {
-        stateRef.current = newValue;
-        forceUpdate((v) => v + 1);
-    }, []);
-
-    const res = updateIf(stateRef.current);
-    if (res !== null) {
-        stateRef.current = res;
-        return [res, setState];
-    }
-
-    return [stateRef.current, setState];
-}
-
 export default function Table({
     idsAndNames,
     vendors,
@@ -417,14 +392,8 @@ export default function Table({
     vendors: Record<string, VendorInfo>;
 }) {
     const [queries, setQueries] = useStateItem("queries");
-    const [queryColumns, setQueryColumns] = useDynamicState<(string[] | null)[]>(
+    const [queryColumns, setQueryColumns] = useState<(string[] | null)[]>(
         Array(queries.length).fill(null),
-        (cols) => {
-            if (cols.length !== queries.length) {
-                return Array(queries.length).fill(null);
-            }
-            return cols;
-        },
     );
     const [loadedValuesRows, setLoadedValuesRows] = React.useState<[Map<string, LoadedValues>]>(
         () => [new Map(idsAndNames.map(({ id }) => [id, null]))]
@@ -457,6 +426,11 @@ export default function Table({
                                             const newQueries = [...queries];
                                             newQueries[i] = q;
                                             setQueries(newQueries);
+                                            setQueryColumns((x) => {
+                                                const newQueryColumns = [...x];
+                                                newQueryColumns[i] = null;
+                                                return newQueryColumns;
+                                            })
                                         }}
                                         deleteQuery={() => {
                                             // Handle the map
@@ -468,6 +442,7 @@ export default function Table({
                                             // Handle deletion of a query from that array
                                             const newQueries = queries.filter((_, idx) => idx !== i);
                                             setQueries(newQueries);
+                                            setQueryColumns((x) => x.filter((_, idx) => idx !== i));
                                         }}
                                         queryColumns={queryColumns[i] || []}
                                         loadedValuesPtr={loadedValuesRows}

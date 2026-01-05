@@ -17,15 +17,15 @@ self.onmessage = workerMessageHandler(
     },
     async (db: Database, payload: Payload): Promise<PayloadResult> => {
         let query = compilationCache.get(payload[1]);
-        if (!query) {
+        if (query) {
+            compilationCache.delete(payload[1]);
+        } else {
             try {
                 query = db.prepare(payload[1]);
             } catch (e) {
                 return [0, (e as Error).message];
             }
-            compilationCache.set(payload[1], query);
         }
-        compilationCache.delete(payload[1]);
 
         try {
             if (payload[0] === 0) {

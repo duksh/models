@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import { loadSingleRow } from "../sqlEngine";
 import BooleanFilter from "./filters/BooleanFilter";
 import StringFilter from "./filters/StringFilter";
@@ -413,6 +413,13 @@ function NameFilter({
     </div>;
 }
 
+function StrictIfDev({ children }: { children: React.ReactNode }) {
+    if (process.env.NODE_ENV === "production") {
+        return children;
+    }
+    return <StrictMode>{children}</StrictMode>;
+}
+
 export default function Table({
     idsAndNames,
     vendors,
@@ -438,93 +445,95 @@ export default function Table({
     }, [idsAndNames, nameFilter, queries, queryColumns, loadedValuesRows, currentSorting]);
 
     return (
-        <div className="flex-1 overflow-x-auto h-full">
-            <div className="flex items-start min-w-max">
-                <table className="h-full">
-                    <thead>
-                        <tr>
-                        <th className="pb-1 relative">
-                            <NameFilter
-                                nameFilter={nameFilter}
-                                setNameFilter={setNameFilter}
-                            />
-                            <div 
-                                className="absolute top-0 right-0 w-1 h-full bg-gray-200 hover:opacity-50 transition-all duration-150" 
-                            />
-                        </th>
-                            {
-                                queries.map((q, i) => (
-                                    <TableHeader
-                                        key={i}
-                                        queryIdx={i}
-                                        query={q}
-                                        updateQuery={(rerunQuery: boolean) => {
-                                            const newQueries = [...queries];
-                                            newQueries[i] = q;
-                                            setQueries(newQueries);
-                                            if (rerunQuery) {
-                                                setCurrentSorting((old) => {
-                                                    if (old?.[0] === i) {
-                                                        return null;
-                                                    }
-                                                    return [i, q.query, true];
+        <StrictIfDev>
+            <div className="flex-1 overflow-x-auto h-full">
+                <div className="flex items-start min-w-max">
+                    <table className="h-full">
+                        <thead>
+                            <tr>
+                            <th className="pb-1 relative">
+                                <NameFilter
+                                    nameFilter={nameFilter}
+                                    setNameFilter={setNameFilter}
+                                />
+                                <div 
+                                    className="absolute top-0 right-0 w-1 h-full bg-gray-200 hover:opacity-50 transition-all duration-150" 
+                                />
+                            </th>
+                                {
+                                    queries.map((q, i) => (
+                                        <TableHeader
+                                            key={i}
+                                            queryIdx={i}
+                                            query={q}
+                                            updateQuery={(rerunQuery: boolean) => {
+                                                const newQueries = [...queries];
+                                                newQueries[i] = q;
+                                                setQueries(newQueries);
+                                                if (rerunQuery) {
+                                                    setCurrentSorting((old) => {
+                                                        if (old?.[0] === i) {
+                                                            return null;
+                                                        }
+                                                        return [i, q.query, true];
+                                                    });
+                                                    setQueryColumns((x) => {
+                                                        const newQueryColumns = [...x];
+                                                        newQueryColumns[i] = null;
+                                                        return newQueryColumns;
+                                                    })
+                                                }
+                                            }}
+                                            deleteQuery={() => {
+                                                // Handle the map
+                                                loadedValuesRows[0].forEach((v) => {
+                                                    v?.splice(i, 1);
                                                 });
-                                                setQueryColumns((x) => {
-                                                    const newQueryColumns = [...x];
-                                                    newQueryColumns[i] = null;
-                                                    return newQueryColumns;
-                                                })
-                                            }
-                                        }}
-                                        deleteQuery={() => {
-                                            // Handle the map
-                                            loadedValuesRows[0].forEach((v) => {
-                                                v?.splice(i, 1);
-                                            });
-                                            setLoadedValuesRows([...loadedValuesRows]);
+                                                setLoadedValuesRows([...loadedValuesRows]);
 
-                                            // Handle deletion of a query from that array
-                                            const newQueries = queries.filter((_, idx) => idx !== i);
-                                            setQueries(newQueries);
-                                            setQueryColumns((x) => x.filter((_, idx) => idx !== i));
+                                                // Handle deletion of a query from that array
+                                                const newQueries = queries.filter((_, idx) => idx !== i);
+                                                setQueries(newQueries);
+                                                setQueryColumns((x) => x.filter((_, idx) => idx !== i));
+                                            }}
+                                            queryColumns={queryColumns[i] || []}
+                                            loadedValuesPtr={loadedValuesRows}
+                                            firstId={idsAndNames[0]?.id || ""}
+                                        />
+                                    ))
+                                }
+                            </tr>
+                        </thead>
+                        <tbody className="h-full overflow-y-scroll">
+                            {
+                                sortedIdsAndNames.map(({ id, name }) => (
+                                    <TableRow
+                                        id={id}
+                                        key={id}
+                                        name={name}
+                                        queryColumns={queryColumns}
+                                        setQueryColumns={setQueryColumns}
+                                        loadedValues={loadedValuesRows[0].get(id) || null}
+                                        setLoadedValues={(vals) => {
+                                            setLoadedValuesRows((prev) => {
+                                                prev[0].set(id, vals);
+                                                return [prev[0]];
+                                            });
                                         }}
-                                        queryColumns={queryColumns[i] || []}
-                                        loadedValuesPtr={loadedValuesRows}
-                                        firstId={idsAndNames[0]?.id || ""}
                                     />
                                 ))
                             }
-                        </tr>
-                    </thead>
-                    <tbody className="h-full overflow-y-scroll">
-                        {
-                            sortedIdsAndNames.map(({ id, name }) => (
-                                <TableRow
-                                    id={id}
-                                    key={id}
-                                    name={name}
-                                    queryColumns={queryColumns}
-                                    setQueryColumns={setQueryColumns}
-                                    loadedValues={loadedValuesRows[0].get(id) || null}
-                                    setLoadedValues={(vals) => {
-                                        setLoadedValuesRows((prev) => {
-                                            prev[0].set(id, vals);
-                                            return [prev[0]];
-                                        });
-                                    }}
-                                />
-                            ))
-                        }
-                    </tbody>
-                </table>
-                <div className="ml-4 shrink-0">
-                    <AddButton
-                        loadedValuesRows={loadedValuesRows[0]}
-                        firstId={idsAndNames[0]?.id || ""}
-                        vendors={vendors}
-                    />
+                        </tbody>
+                    </table>
+                    <div className="ml-4 shrink-0">
+                        <AddButton
+                            loadedValuesRows={loadedValuesRows[0]}
+                            firstId={idsAndNames[0]?.id || ""}
+                            vendors={vendors}
+                        />
+                    </div>
                 </div>
             </div>
-        </div>
+        </StrictIfDev>
     );
 }

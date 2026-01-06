@@ -30,6 +30,7 @@ function shouldIncludeModel(modelId: string): boolean {
     // Skip VL (vision-language) models and embedding models
     if (lowerModelId.includes("-vl")) return false;
     if (lowerModelId.includes("embed")) return false;
+    if (lowerModelId.includes("latest")) return false;
 
     return INCLUDED_MODEL_PATTERNS.some(pattern => lowerModelId.includes(pattern));
 }

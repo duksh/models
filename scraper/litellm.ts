@@ -92,7 +92,7 @@ export async function getModelsForProvider(
  * Extracts a clean model name from a LiteLLM model ID.
  * Removes provider prefixes and normalizes the name.
  */
-export function cleanModelName(modelId: string, provider: string): string {
+export function cleanModelName(modelId: string, provider: string): string | null {
     // Remove provider prefix (e.g., "openai/gpt-4o" -> "gpt-4o", "mistral/mistral-large" -> "mistral-large")
     let name = modelId;
 
@@ -116,7 +116,7 @@ export function cleanModelName(modelId: string, provider: string): string {
     }
 
     // Convert to title case and clean up
-    return name
+    const res = name
         .split(/[-_]/)
         .map(part => {
             // Keep version numbers as-is
@@ -132,6 +132,10 @@ export function cleanModelName(modelId: string, provider: string): string {
         .replace(/(\d+)([a-z])/gi, "$1 $2") // Space before letters after numbers
         .replace(/\s+/g, " ")
         .trim();
+    if (res.toLowerCase().includes("preview") || res.toLowerCase().includes("latest")) {
+        return null;
+    }
+    return res;
 }
 
 /**

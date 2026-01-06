@@ -36,6 +36,7 @@ function shouldIncludeModel(modelId: string): boolean {
     if (lowerModelId.includes("thinking")) return false;
     if (lowerModelId.includes("live")) return false;
     if (lowerModelId.includes("audio")) return false;
+    if (lowerModelId.includes("preview")) return false;
 
     return INCLUDED_MODEL_PATTERNS.some(pattern => lowerModelId.includes(pattern));
 }

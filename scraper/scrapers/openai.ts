@@ -9,18 +9,18 @@ const MODEL_NAME_OVERRIDES: Record<string, string> = {
     "gpt-4-turbo": "GPT-4 Turbo",
     "gpt-4": "GPT-4",
     "gpt-3.5-turbo": "GPT-3.5 Turbo",
-    "o1": "o1",
-    "o1-mini": "o1 Mini",
-    "o1-preview": "o1 Preview",
-    "o3": "o3",
-    "o3-mini": "o3 Mini",
-    "o4-mini": "o4 Mini",
+    "o1": "GPT-o1",
+    "o1-mini": "GPT-o1 Mini",
+    "o1-preview": "GPT-o1 Preview",
+    "o3": "GPT-o3",
+    "o3-mini": "GPT-o3 Mini",
+    "o4-mini": "GPT-o4 Mini",
     "gpt-4.1": "GPT-4.1",
     "gpt-4.1-mini": "GPT-4.1 Mini",
     "gpt-4.1-nano": "GPT-4.1 Nano",
     "gpt-5": "GPT-5",
     "gpt-5-mini": "GPT-5 Mini",
-    "chatgpt-4o-latest": "ChatGPT-4o Latest",
+    "chatgpt-4o-latest": "GPT-4o",
 };
 
 // Models to include (filter out fine-tuned, deprecated, and irrelevant models)
@@ -49,7 +49,7 @@ function shouldIncludeModel(modelId: string): boolean {
     return INCLUDED_MODEL_PREFIXES.some(prefix => modelId.startsWith(prefix));
 }
 
-function getModelName(modelId: string): string {
+function getModelName(modelId: string): string | null {
     // Check for exact override
     if (MODEL_NAME_OVERRIDES[modelId]) {
         return MODEL_NAME_OVERRIDES[modelId];
@@ -70,8 +70,11 @@ function litellmModelToDefinition(modelId: string, model: LiteLLMModel): ModelDe
         return null;
     }
 
+    const name = getModelName(modelId);
+    if (!name) return null;
+
     return {
-        name: getModelName(modelId),
+        name,
         provider: "OpenAI",
         pricing: {
             input: model.input_cost_per_token,

@@ -1,4 +1,4 @@
-import React, { StrictMode } from "react";
+import React from "react";
 import { loadSingleRow } from "../sqlEngine";
 import BooleanFilter from "./filters/BooleanFilter";
 import StringFilter from "./filters/StringFilter";
@@ -158,26 +158,9 @@ function TableHeader({
                 updateQuery(false);
             }}
         >
-            <div className="flex items-center">
+            <div className="flex items-center mb-1">
                 <div className="block grow">
                     <div className="line-clamp-2" title={col}>{col}</div>
-                    <div className="w-full">
-                        <QueryFilter
-                            columnName={col}
-                            query={query}
-                            updateQuery={updateQuery}
-                            values={values.map((lv) => {
-                                if (lv === null) {
-                                    return undefined;
-                                }
-                                const queryFromIdx = lv[queryIdx];
-                                if (!Array.isArray(queryFromIdx)) {
-                                    return undefined;
-                                }
-                                return queryFromIdx[idx];
-                            }).filter((v) => v !== undefined)}
-                        />
-                    </div>
                 </div>
                 <SortingButtons
                     ascending={currentSorting?.[0] === queryIdx ? currentSorting[2] : null}
@@ -202,6 +185,23 @@ function TableHeader({
                         </>
                     )
                 }
+            </div>
+            <div className="w-full">
+                <QueryFilter
+                    columnName={col}
+                    query={query}
+                    updateQuery={updateQuery}
+                    values={values.map((lv) => {
+                        if (lv === null) {
+                            return undefined;
+                        }
+                        const queryFromIdx = lv[queryIdx];
+                        if (!Array.isArray(queryFromIdx)) {
+                            return undefined;
+                        }
+                        return queryFromIdx[idx];
+                    }).filter((v) => v !== undefined)}
+                />
             </div>
         </Column>
     ));
@@ -264,7 +264,7 @@ async function loadSingleRowData(
             await load(q, i);
         }
     }
-    setRowVisible(noFiltersNegative);
+    if (mountedRef[0]) setRowVisible(noFiltersNegative);
 
     // Then, handle any unfiltered columns
     for (let i = 0; i < queries.length; i++) {
@@ -346,7 +346,9 @@ function TableRow({
                 ) : (
                     new Array({ length: queries.length }).map((_, i) => (
                         <td key={i}>
-                            
+                            <div
+                                className="absolute top-0 right-0 w-1 h-full cursor-col-resize bg-gray-200 hover:opacity-50 transition-all duration-150" 
+                            />
                         </td>
                     ))
                 )

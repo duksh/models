@@ -46,7 +46,7 @@ export function NumberFilter({
                     setFilterValue(newFilter);
                     updateQuery(false);
                 }}
-                className="border text-sm border-gray-300 rounded-md p-1"
+                className="border text-sm border-gray-300 rounded-md p-1 w-full"
                 aria-label={`Value for filtering ${columnName}`}
             />
         </div>

@@ -21,7 +21,7 @@ export default function SortingButtons({
                 className="leading-2 p-0 border-none bg-none cursor-pointer"
                 aria-label="Sort ascending"
             >
-                <ArrowUp size={16} color={ascending === true ? "black" : "gray"} />
+                <ArrowUp size={14} color={ascending === true ? "black" : "gray"} />
             </button>
             <button
                 onClick={() => setSorting(columnName, (oldValue) => {
@@ -33,7 +33,7 @@ export default function SortingButtons({
                 className="leading-2 p-0 border-none bg-none cursor-pointer"
                 aria-label="Sort descending"
             >
-                <ArrowDown size={16} color={ascending === false ? "black" : "gray"} />
+                <ArrowDown size={14} color={ascending === false ? "black" : "gray"} />
             </button>
         </div>
     );

@@ -13,10 +13,10 @@ export type SQLModalProps = {
 
 export const CodeMirror = React.lazy(() => import("./CodeMirror"));
 
-export async function testQuery(query: string, firstId: string): Promise<{ ok: boolean; error?: string }> {
+export async function testQuery(query: string, firstId: string): Promise<{ ok: boolean; error?: string; row?: { [column: string]: any } }> {
     try {
         const rows = await loadMultipleRows(query, [firstId]);
-        if (!rows) {
+        if (!rows || rows.length === 0) {
             return {
                 ok: false,
                 error: "No rows returned",
@@ -28,6 +28,10 @@ export async function testQuery(query: string, firstId: string): Promise<{ ok: b
                 error: "Query returned more than one row. Please ensure your query returns exactly one row.",
             };
         }
+        return {
+            ok: true,
+            row: rows[0],
+        };
     } catch (e) {
         console.log("Error testing query:", e);
         return {
@@ -35,10 +39,6 @@ export async function testQuery(query: string, firstId: string): Promise<{ ok: b
             error: `Query failed to execute: ${(e as any).message}`,
         };
     }
-
-    return {
-        ok: true,
-    };
 }
 
 function SQLModalInner({

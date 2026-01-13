@@ -4,6 +4,8 @@ import { PencilIcon, XIcon } from "lucide-react";
 import { CodeMirror, testQuery } from "./SQLModal";
 import ColumnCustomTypeSelector from "./ColumnCustomTypeSelector";
 import Button from "./Button";
+import { loadSingleRow } from "../sqlEngine";
+import { detectColumnRename, migrateColumnConfigs } from "./utils/migrateColumnConfigs";
 
 type SQLEditorButtonProps = {
     query: ColumnQuery;
@@ -28,22 +30,45 @@ export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEdit
         setOutput(null);
     }, []);
 
-    const submit = React.useCallback((e: React.FormEvent) => {
+    const submit = React.useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
-        testQuery(valueRef.current, firstId).then((res) => {
-            if (!res.ok) {
-                setOutput(<span className="text-red-600 mb-4">Error: {res.error}</span>);
-                return;
-            }
 
-            query.query = valueRef.current;
-            query.columnExplicitlySetDataTypes = {
-                ...columnCustomTypes.current,
-            };
-            updateQuery(true);
-            exit();
-        });
-    }, [columnCustomTypes]);
+        // Get old row data before changing the query (for migration detection)
+        let oldRow: { [column: string]: any } | null = null;
+        try {
+            oldRow = await loadSingleRow(query.query, firstId);
+        } catch {
+            // If old query fails, we can't migrate - proceed anyway
+            oldRow = null;
+        }
+
+        // Test the new query
+        const res = await testQuery(valueRef.current, firstId);
+        if (!res.ok) {
+            setOutput(<span className="text-red-600 mb-4">Error: {res.error}</span>);
+            return;
+        }
+
+        // Detect column rename and migrate configs if applicable
+        if (oldRow && res.row) {
+            const rename = detectColumnRename(oldRow, res.row);
+            if (rename) {
+                migrateColumnConfigs(query, rename.oldName, rename.newName);
+                // Also migrate the local columnCustomTypes ref so it doesn't overwrite the migration
+                if (rename.oldName in columnCustomTypes.current) {
+                    columnCustomTypes.current[rename.newName] = columnCustomTypes.current[rename.oldName];
+                    delete columnCustomTypes.current[rename.oldName];
+                }
+            }
+        }
+
+        query.query = valueRef.current;
+        query.columnExplicitlySetDataTypes = {
+            ...columnCustomTypes.current,
+        };
+        updateQuery(true);
+        exit();
+    }, [columnCustomTypes, firstId, query]);
 
     return (
         <>

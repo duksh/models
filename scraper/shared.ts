@@ -5,6 +5,7 @@ import {
     isSelfHostableModel,
     addBenchmarkDataForModel,
 } from "./constants";
+import { getPerformanceMetrics } from "./scrapers/artificialanalysis";
 
 export const PROVIDERS: Record<string, string> = {
     Meta: "US",
@@ -88,11 +89,14 @@ export async function addModelToFormat(
 
     let vendor = modelEntry.vendors.find(v => v.vendorRef === vendorRef);
     if (!vendor) {
+        // Look up performance metrics from Artificial Analysis data
+        const perfMetrics = getPerformanceMetrics(slugifiedModel, vendorRef);
+
         vendor = {
             vendorRef,
             regionPricing: {},
-            latencyMs: 0,
-            tokensPerSecond: 0,
+            latencyMs: perfMetrics?.latencyMs ?? 0,
+            tokensPerSecond: perfMetrics?.tokensPerSecond ?? 0,
             lowCapacity: false,
         };
         modelEntry.vendors.push(vendor);

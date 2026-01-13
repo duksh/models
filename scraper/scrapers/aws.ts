@@ -5,6 +5,7 @@ import {
     isSelfHostableModel,
     addBenchmarkDataForModel,
 } from "../constants";
+import { getPerformanceMetrics } from "./artificialanalysis";
 
 type PriceDimension = {
     pricePerUnit?: {
@@ -75,11 +76,14 @@ async function processPriceDimension(
 
     let vendor = modelEntry.vendors.find(v => v.vendorRef === "aws");
     if (!vendor) {
+        // Look up performance metrics from Artificial Analysis data
+        const perfMetrics = getPerformanceMetrics(slugifiedModel, "aws");
+
         vendor = {
             vendorRef: "aws",
             regionPricing: {},
-            latencyMs: 0, // TODO
-            tokensPerSecond: 0, // TODO
+            latencyMs: perfMetrics?.latencyMs ?? 0,
+            tokensPerSecond: perfMetrics?.tokensPerSecond ?? 0,
             lowCapacity: false,
         };
         modelEntry.vendors.push(vendor);

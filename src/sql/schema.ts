@@ -37,8 +37,8 @@ CREATE TABLE models_tokenisers (
 CREATE TABLE models_vendors (
     model_id TEXT NOT NULL,
     vendor_id TEXT NOT NULL,
-    latency_ms INTEGER NOT NULL,
-    tokens_per_second INTEGER NOT NULL,
+    latency_ms INTEGER,
+    tokens_per_second INTEGER,
     low_capacity BOOLEAN NOT NULL,
     PRIMARY KEY (model_id, vendor_id)
 );

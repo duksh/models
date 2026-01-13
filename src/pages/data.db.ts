@@ -78,8 +78,8 @@ export const GET: APIRoute = () => {
                 modelsVendorsPrep.run([
                     modelId,
                     vendor.vendorRef,
-                    vendor.latencyMs,
-                    vendor.tokensPerSecond,
+                    vendor.latencyMs || null,
+                    vendor.tokensPerSecond || null,
                     vendor.lowCapacity ? 1 : 0,
                 ]);
                 for (const [regionCode, [inputTokenCost, outputTokenCost, cachedInputTokenCost, cachedOutputTokenCost]] of Object.entries(vendor.regionPricing)) {

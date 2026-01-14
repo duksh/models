@@ -45,22 +45,31 @@ export default function PricingCalculator({ modelId, model, vendors }: PricingCa
     const rate = forexData[currency as keyof typeof forexData]?.rate ?? 1;
 
     let totalCost = 0;
+    let inputCostTotal = 0;
+    let outputCostTotal = 0;
+    let cachedInputCostTotal = 0;
     let hasCachedPricing = false;
 
     if (pricing) {
         const [inputCost, outputCost, cachedInputCost] = pricing;
-        totalCost = (inputTokens * inputCost + outputTokens * outputCost) * rate;
+        inputCostTotal = inputTokens * inputCost * rate;
+        outputCostTotal = outputTokens * outputCost * rate;
+        totalCost = inputCostTotal + outputCostTotal;
         if (cachedInputCost !== null) {
             hasCachedPricing = true;
-            totalCost += cachedInputTokens * cachedInputCost * rate;
+            cachedInputCostTotal = cachedInputTokens * cachedInputCost * rate;
+            totalCost += cachedInputCostTotal;
         }
     }
 
-    const formattedCost = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: currency || "USD",
-        maximumFractionDigits: 6,
-    }).format(totalCost);
+    const formatCurrency = (value: number) =>
+        new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: currency || "USD",
+            maximumFractionDigits: 6,
+        }).format(value);
+
+    const formattedCost = formatCurrency(totalCost);
 
     const getRegionName = (regionCode: string): string => {
         if (!selectedVendorInfo) return regionCode;
@@ -79,7 +88,20 @@ export default function PricingCalculator({ modelId, model, vendors }: PricingCa
                     <DollarSign className="w-8 h-8" />
                     <span className="text-sm font-medium">Pricing</span>
                 </div>
-                <div className="text-3xl font-bold">{formattedCost}</div>
+                <div>
+                    <div className="text-3xl font-bold">{formattedCost}</div>
+                    <div className="text-sm text-gray-500">
+                        <span>Input: {formatCurrency(inputCostTotal)}</span>
+                        <span className="mx-2">·</span>
+                        <span>Output: {formatCurrency(outputCostTotal)}</span>
+                        {hasCachedPricing && cachedInputCostTotal > 0 && (
+                            <>
+                                <span className="mx-2">·</span>
+                                <span>Cached: {formatCurrency(cachedInputCostTotal)}</span>
+                            </>
+                        )}
+                    </div>
+                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">

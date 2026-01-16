@@ -53,7 +53,7 @@ export const GET: APIRoute = () => {
 
         // Add the models
         const modelsPrep = db.prepare(
-            "INSERT INTO models (model_id, clean_name, brand, company_country_code, selfhostable, reasoning, humanitys_last_exam_percentage, swe_bench_resolved_percentage, skatebench_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO models (model_id, clean_name, brand, company_country_code, selfhostable, reasoning, reasoning_tier, max_input_tokens, max_output_tokens, training_cutoff, release_date, humanitys_last_exam_percentage, swe_bench_resolved_percentage, skatebench_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
         const modelsTokenisersPrep = db.prepare(
             "INSERT INTO models_tokenisers (model_id, tokeniser, url) VALUES (?, ?, ?)"
@@ -72,6 +72,11 @@ export const GET: APIRoute = () => {
                 modelData.companyCountryCode,
                 modelData.selfhostable ? 1 : 0,
                 modelData.reasoning ? 1 : 0,
+                modelData.reasoningTier ?? null,
+                modelData.maxInputTokens ?? null,
+                modelData.maxOutputTokens ?? null,
+                modelData.trainingCutoff ?? null,
+                modelData.releaseDate ?? null,
                 modelData.humanitysLastExamPercentage ?? null,
                 modelData.sweBenchResolvedPercentage ?? null,
                 modelData.skatebenchScore ?? null,

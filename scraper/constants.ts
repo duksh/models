@@ -94,6 +94,152 @@ export function isReasoningModel(modelId: string): boolean {
     );
 }
 
+export type ReasoningTier = "none" | "basic" | "extended";
+
+// Models with extended reasoning capabilities (chain-of-thought, extended thinking)
+const EXTENDED_REASONING_PREFIXES = [
+    "o1",
+    "o3",
+    "deepseek-r1",
+    "deepseek-reasoner",
+    "claude-3-7-sonnet", // Extended thinking capable
+    "claude-sonnet-4", // Extended thinking capable
+    "claude-opus-4", // Extended thinking capable
+    "gemini-2-5", // Thinking mode
+    "qwen3", // Thinking mode
+    "magistral", // Reasoning model
+];
+
+export function getReasoningTier(modelId: string): ReasoningTier {
+    // Check for extended reasoning models first
+    for (const prefix of EXTENDED_REASONING_PREFIXES) {
+        if (modelId.startsWith(prefix)) {
+            return "extended";
+        }
+    }
+
+    // Check if it's a reasoning model at all
+    try {
+        if (isReasoningModel(modelId)) {
+            return "basic";
+        }
+    } catch {
+        // Unknown model, default to none
+    }
+
+    return "none";
+}
+
+// Model metadata: training cutoff dates
+// Format: "YYYY-MM" or "YYYY-MM-DD" for more precision
+const MODEL_TRAINING_CUTOFFS: Record<string, string> = {
+    // OpenAI
+    "gpt-5": "2024-12",
+    "gpt-4-1": "2024-06",
+    "gpt-4o": "2023-10",
+    "gpt-4-turbo": "2023-12",
+    "gpt-4": "2021-09",
+    "gpt-3": "2021-09",
+    o3: "2024-12",
+    o1: "2023-10",
+    // Anthropic
+    "claude-opus-4": "2025-03",
+    "claude-sonnet-4": "2025-03",
+    "claude-haiku-4": "2025-03",
+    "claude-3-7-sonnet": "2024-11",
+    "claude-3-5-sonnet": "2024-04",
+    "claude-3-5-haiku": "2024-04",
+    "claude-3-opus": "2023-08",
+    "claude-3-sonnet": "2023-08",
+    "claude-3-haiku": "2023-08",
+    // Meta
+    "llama-4": "2024-08",
+    "llama-3-3": "2023-12",
+    "llama-3": "2023-03",
+    // Mistral
+    magistral: "2024-12",
+    "mistral-large": "2024-11",
+    "mistral-medium": "2024-07",
+    "mistral-small": "2024-09",
+    // DeepSeek
+    "deepseek-r1": "2024-11",
+    "deepseek-v3": "2024-11",
+    // Qwen
+    "qwen3": "2024-09",
+    "qwen-max": "2024-06",
+    // Google
+    "gemini-2-5": "2025-01",
+    "gemini-2-0": "2024-08",
+    "gemini-1-5": "2023-11",
+};
+
+export function getTrainingCutoff(modelId: string): string | undefined {
+    for (const [prefix, cutoff] of Object.entries(MODEL_TRAINING_CUTOFFS).sort(
+        (a, b) => b[0].length - a[0].length
+    )) {
+        if (modelId.startsWith(prefix)) {
+            return cutoff;
+        }
+    }
+    return undefined;
+}
+
+// Model metadata: release dates
+// Format: "YYYY-MM-DD"
+const MODEL_RELEASE_DATES: Record<string, string> = {
+    // OpenAI
+    "gpt-4o": "2024-05-13",
+    "gpt-4-turbo": "2024-04-09",
+    "gpt-4": "2023-03-14",
+    o3: "2025-04-16",
+    "o1-pro": "2024-12-05",
+    o1: "2024-09-12",
+    // Anthropic
+    "claude-opus-4-5": "2025-11-01",
+    "claude-opus-4-1": "2025-05-15",
+    "claude-sonnet-4-5": "2025-06-20",
+    "claude-sonnet-4": "2025-05-14",
+    "claude-haiku-4-5": "2025-10-01",
+    "claude-3-7-sonnet": "2025-02-19",
+    "claude-3-5-sonnet": "2024-06-20",
+    "claude-3-5-haiku": "2024-10-22",
+    "claude-3-opus": "2024-02-29",
+    "claude-3-sonnet": "2024-02-29",
+    "claude-3-haiku": "2024-03-07",
+    // Meta
+    "llama-4": "2025-04-05",
+    "llama-3-3": "2024-12-06",
+    "llama-3-2": "2024-09-25",
+    "llama-3-1": "2024-07-23",
+    "llama-3": "2024-04-18",
+    // Mistral
+    magistral: "2025-05-29",
+    "mistral-large": "2024-02-26",
+    "mistral-medium": "2023-12-11",
+    "mistral-small": "2024-09-17",
+    // DeepSeek
+    "deepseek-r1": "2025-01-20",
+    "deepseek-v3": "2024-12-26",
+    // Qwen
+    "qwen3-235b": "2025-04-28",
+    "qwen3-max": "2025-04-28",
+    // Google
+    "gemini-2-5": "2025-03-25",
+    "gemini-2-0": "2024-12-11",
+    "gemini-1-5": "2024-02-15",
+};
+
+export function getReleaseDate(modelId: string): string | undefined {
+    for (const [prefix, date] of Object.entries(MODEL_RELEASE_DATES).sort(
+        (a, b) => b[0].length - a[0].length
+    )) {
+        if (modelId.startsWith(prefix)) {
+            return date;
+        }
+    }
+    return undefined;
+}
+
 export function isSelfHostableModel(modelId: string, provider: string): boolean {
     if (provider === "Meta") {
         // All Meta models are self-hostable

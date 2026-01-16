@@ -76,6 +76,8 @@ function litellmModelToDefinition(modelId: string, model: LiteLLMModel): ModelDe
             output: model.output_cost_per_token,
             cachedInput: getCachedInputCost(model),
         },
+        maxInputTokens: model.max_input_tokens,
+        maxOutputTokens: model.max_output_tokens ?? model.max_tokens,
     };
 }
 

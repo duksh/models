@@ -20,11 +20,49 @@ function MetadataItem({ label, value, href }: { label: string; value: string; hr
     );
 }
 
+function formatTokenCount(count: number): string {
+    if (count >= 1_000_000) {
+        return `${(count / 1_000_000).toFixed(count % 1_000_000 === 0 ? 0 : 1)}M`;
+    }
+    if (count >= 1_000) {
+        return `${(count / 1_000).toFixed(count % 1_000 === 0 ? 0 : 1)}K`;
+    }
+    return count.toString();
+}
+
+function formatReasoningTier(tier: string | undefined, reasoning: boolean): string {
+    if (!reasoning) return "None";
+    if (tier === "extended") return "Extended";
+    if (tier === "basic") return "Basic";
+    return "Yes";
+}
+
 export default function ModelMetadata({ model }: { model: Model }) {
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8 p-4 bg-gray-50 rounded-lg">
             <MetadataItem label="Self-hostable" value={model.selfhostable ? "Yes" : "No"} />
-            <MetadataItem label="Reasoning Capable" value={model.reasoning ? "Yes" : "No"} />
+            <MetadataItem
+                label="Reasoning Tier"
+                value={formatReasoningTier(model.reasoningTier, model.reasoning)}
+            />
+            {(model.maxInputTokens !== undefined || model.maxOutputTokens !== undefined) && (
+                <MetadataItem
+                    label="Max Tokens"
+                    value={
+                        model.maxInputTokens !== undefined && model.maxOutputTokens !== undefined
+                            ? `${formatTokenCount(model.maxInputTokens)} in / ${formatTokenCount(model.maxOutputTokens)} out`
+                            : model.maxInputTokens !== undefined
+                              ? `${formatTokenCount(model.maxInputTokens)} in`
+                              : `${formatTokenCount(model.maxOutputTokens!)} out`
+                    }
+                />
+            )}
+            {model.trainingCutoff !== undefined && (
+                <MetadataItem label="Training Cutoff" value={model.trainingCutoff} />
+            )}
+            {model.releaseDate !== undefined && (
+                <MetadataItem label="Release Date" value={model.releaseDate} />
+            )}
             {model.humanitysLastExamPercentage !== undefined && (
                 <MetadataItem
                     label="Humanity's Last Exam"

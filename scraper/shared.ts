@@ -4,8 +4,13 @@ import {
     isReasoningModel,
     isSelfHostableModel,
     addBenchmarkDataForModel,
+    getReasoningTier,
+    getTrainingCutoff,
+    getReleaseDate,
+    type ReasoningTier,
 } from "./constants";
 import { getPerformanceMetrics } from "./scrapers/artificialanalysis";
+import { getOpenRouterMetadata } from "./openrouter";
 
 export const PROVIDERS: Record<string, string> = {
     Meta: "US",
@@ -44,10 +49,17 @@ type ModelPricing = {
     cachedOutput?: number; // per token
 };
 
+export type { ReasoningTier };
+
 export type ModelDefinition = {
     name: string;
     provider: string;
     pricing: ModelPricing;
+    maxInputTokens?: number;
+    maxOutputTokens?: number;
+    reasoningTier?: ReasoningTier;
+    trainingCutoff?: string; // Date string like "2024-04"
+    releaseDate?: string; // Date string like "2024-03-14"
 };
 
 export async function addModelToFormat(
@@ -75,6 +87,9 @@ export async function addModelToFormat(
             selfhostable = false; // Default for unknown models
         }
 
+        // Fetch metadata from OpenRouter for fields not provided by scraper or constants
+        const openRouterMeta = await getOpenRouterMetadata(slugifiedModel);
+
         modelEntry = {
             cleanName: model.name,
             brand: model.provider,
@@ -82,6 +97,12 @@ export async function addModelToFormat(
             vendors: [],
             reasoning,
             selfhostable,
+            reasoningTier: model.reasoningTier ?? getReasoningTier(slugifiedModel),
+            maxInputTokens: model.maxInputTokens ?? openRouterMeta.maxInputTokens,
+            maxOutputTokens: model.maxOutputTokens ?? openRouterMeta.maxOutputTokens,
+            trainingCutoff: model.trainingCutoff ?? getTrainingCutoff(slugifiedModel),
+            releaseDate:
+                model.releaseDate ?? getReleaseDate(slugifiedModel) ?? openRouterMeta.releaseDate,
             tokeniser: getTokeniserForModel(slugifiedModel, model.provider),
             ...(await addBenchmarkDataForModel(slugifiedModel)),
         };

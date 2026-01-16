@@ -67,6 +67,8 @@ type SiteAPITokeniser = {
 
 type Tokenisers = TiktokenTokeniser | TransformersTokeniser | SiteAPITokeniser;
 
+type ReasoningTier = "none" | "basic" | "extended";
+
 type Model = {
     cleanName: string;
     brand: string;
@@ -74,6 +76,11 @@ type Model = {
     vendors: VendorModelInfo[];
     selfhostable: boolean;
     reasoning: boolean;
+    reasoningTier?: ReasoningTier;
+    maxInputTokens?: number;
+    maxOutputTokens?: number;
+    trainingCutoff?: string; // Date string like "2024-04"
+    releaseDate?: string; // Date string like "2024-03-14"
     tokeniser?: Tokenisers;
     humanitysLastExamPercentage?: number;
     sweBenchResolvedPercentage?: number;

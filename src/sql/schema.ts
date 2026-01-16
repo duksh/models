@@ -22,6 +22,11 @@ CREATE TABLE models (
     company_country_code TEXT NOT NULL,
     selfhostable BOOLEAN NOT NULL,
     reasoning BOOLEAN NOT NULL,
+    reasoning_tier TEXT,
+    max_input_tokens INTEGER,
+    max_output_tokens INTEGER,
+    training_cutoff TEXT,
+    release_date TEXT,
     humanitys_last_exam_percentage REAL,
     swe_bench_resolved_percentage REAL,
     skatebench_score REAL

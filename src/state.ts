@@ -64,7 +64,8 @@ try {
         const parsedState = JSON.parse(savedState);
         currentLlmState.currency = parsedState.currency || currentLlmState.currency;
         currentLlmState.queries = parsedState.queries || currentLlmState.queries;
-        currentLlmState.currentSorting = parsedState.currentSorting || currentLlmState.currentSorting;
+        currentLlmState.currentSorting =
+            parsedState.currentSorting || currentLlmState.currentSorting;
         currentLlmState.nameFilter = parsedState.nameFilter || currentLlmState.nameFilter;
     }
 } catch {
@@ -96,18 +97,17 @@ function setUrlId(id: string | null) {
 async function writeToRemoteStorage(state: State) {
     const u = new URL(window.location.href);
     const type_ = u.pathname === "/" ? "llm" : "image";
-    const res = await fetch(
-        "https://modelskv.vantage-api.com/",
-        {
-            method: "POST",
-            body: JSON.stringify({
-                t: type_,
-                state: state,
-            }),
-        }
-    );
+    const res = await fetch("https://modelskv.vantage-api.com/", {
+        method: "POST",
+        body: JSON.stringify({
+            t: type_,
+            state: state,
+        }),
+    });
     if (!res.ok) {
-        console.error(`Failed to write to remote storage: ${res.status} ${res.statusText} ${await res.text()}`);
+        console.error(
+            `Failed to write to remote storage: ${res.status} ${res.statusText} ${await res.text()}`
+        );
     }
     u.searchParams.set("id", await res.text());
     window.history.replaceState({}, "", u.toString());
@@ -124,7 +124,9 @@ async function readFromRemoteStorage(): Promise<{
     }
     const res = await fetch(`https://modelskv.vantage-api.com/${encodeURIComponent(id)}`);
     if (!res.ok) {
-        console.error(`Failed to read from remote storage: ${res.status} ${res.statusText} ${await res.text()}`);
+        console.error(
+            `Failed to read from remote storage: ${res.status} ${res.statusText} ${await res.text()}`
+        );
         return null;
     }
     return res.json();

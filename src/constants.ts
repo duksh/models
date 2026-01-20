@@ -9,8 +9,19 @@ function singleValue(key: string, niceName: string, dataType?: ColumnDataType) {
     };
 }
 
+const llmVendors = {
+    name: "Vendors",
+    query: `SELECT GROUP_CONCAT(vendors.clean_name, ', ') AS \`Vendors\`
+    FROM models_vendors
+    JOIN vendors ON models_vendors.vendor_id = vendors.vendor_id
+    WHERE models_vendors.model_id = ?
+`,
+    columnExplicitlySetDataTypes: {},
+}
+
 export const defaultQueries = [
     singleValue("company", "Company"),
+    llmVendors,
     singleValue("company_country_code", "Company Country Code", "country"),
     singleValue("selfhostable", "Self-hostable", "boolean"),
     singleValue("reasoning", "Supports Reasoning", "boolean"),
@@ -34,8 +45,19 @@ function imageSingleValue(key: string, niceName: string, dataType?: ColumnDataTy
     };
 }
 
+const imageVendors = {
+    name: "Vendors",
+    query: `SELECT GROUP_CONCAT(vendors.clean_name, ', ') AS \`Vendors\`
+    FROM image_models_vendors
+    JOIN vendors ON image_models_vendors.vendor_id = vendors.vendor_id
+    WHERE image_models_vendors.model_id = ?
+`,
+    columnExplicitlySetDataTypes: {},
+};
+
 export const defaultImageQueries = [
     imageSingleValue("company", "Company"),
+    imageVendors,
     imageSingleValue("company_country_code", "Company Country Code", "country"),
     {
         name: "Resolutions",

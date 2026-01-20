@@ -111,6 +111,10 @@ readFromRemoteStorage().then((remoteState) => {
         o.currency = remoteState.state.currency;
         o.queries = remoteState.state.queries;
         o.nameFilter = remoteState.state.nameFilter;
+        o.currentSorting = remoteState.state.currentSorting;
+        listenerMap.forEach((listeners) => {
+            listeners.forEach((listener) => listener());
+        });
     }
 });
 

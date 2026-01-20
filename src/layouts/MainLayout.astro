@@ -3,6 +3,9 @@ import { ClientRouter } from "astro:transitions";
 import Header from "../components/Header.astro";
 import "../styles/global.css";
 
+import GTMHead from "../components/gtm/GTMHead.astro";
+import GTMBody from "../components/gtm/GTMBody.astro";
+
 interface Props {
     titleExtra?: string;
     description?: string;
@@ -31,6 +34,7 @@ if (!description) {
         <link rel="icon" href="/favicon.png" />
         <ClientRouter />
         <slot name="head" />
+        <GTMHead />
     </head>
 
     <body>
@@ -38,5 +42,6 @@ if (!description) {
         <main class="h-[calc(100vh-4rem)] overflow-auto">
             <slot />
         </main>
+        <GTMBody />
     </body>
 </html>

@@ -29,3 +29,4 @@ jobs:
             wranglerVersion: "4.59.1"
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GTM_ID: ${{ secrets.GTM_ID }}

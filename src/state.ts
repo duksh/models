@@ -132,7 +132,7 @@ async function readFromRemoteStorage(): Promise<{
     return res.json();
 }
 
-if (window) {
+if (typeof window !== "undefined") {
     readFromRemoteStorage().then((remoteState) => {
         if (remoteState) {
             const o = remoteState.t === "llm" ? currentLlmState : currentImageState;

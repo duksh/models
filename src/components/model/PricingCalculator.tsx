@@ -1,5 +1,4 @@
 import React from "react";
-import { DollarSign } from "lucide-react";
 import type { Model, VendorInfo } from "../../dataFormat";
 import { useStateItem } from "../../state";
 import CurrencyPicker from "../CurrencyPicker";
@@ -83,11 +82,8 @@ export default function PricingCalculator({ modelId, model, vendors }: PricingCa
 
     return (
         <div className="p-6 border dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-sm">
+            <h2 className="text-xl font-semibold mb-4">{model.cleanName} Pricing</h2>
             <div className="flex items-center gap-4 mb-6">
-                <div className="flex flex-col items-center">
-                    <DollarSign className="w-8 h-8" />
-                    <span className="text-sm font-medium">Pricing</span>
-                </div>
                 <div>
                     <div className="text-3xl font-bold">{formattedCost}</div>
                     <div className="text-sm text-gray-500 dark:text-gray-400">

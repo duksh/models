@@ -52,7 +52,7 @@ export default function ImageModelPage({ modelId, model, vendors }: ImageModelPa
                 </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Pricing by Vendor</h2>
+                <h2 className="text-xl font-semibold mb-4">{model.cleanName} Pricing</h2>
                 {model.vendors.map((vendorModel) => {
                     const vendor = vendors[vendorModel.vendorRef.split(":")[0]];
                     return (

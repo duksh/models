@@ -132,18 +132,20 @@ async function readFromRemoteStorage(): Promise<{
     return res.json();
 }
 
-readFromRemoteStorage().then((remoteState) => {
-    if (remoteState) {
-        const o = remoteState.t === "llm" ? currentLlmState : currentImageState;
-        o.currency = remoteState.state.currency;
-        o.queries = remoteState.state.queries;
-        o.nameFilter = remoteState.state.nameFilter || o.nameFilter;
-        o.currentSorting = remoteState.state.currentSorting || o.currentSorting;
-        listenerMap.forEach((listeners) => {
-            listeners.forEach((listener) => listener());
-        });
-    }
-});
+if (window) {
+    readFromRemoteStorage().then((remoteState) => {
+        if (remoteState) {
+            const o = remoteState.t === "llm" ? currentLlmState : currentImageState;
+            o.currency = remoteState.state.currency;
+            o.queries = remoteState.state.queries;
+            o.nameFilter = remoteState.state.nameFilter || o.nameFilter;
+            o.currentSorting = remoteState.state.currentSorting || o.currentSorting;
+            listenerMap.forEach((listeners) => {
+                listeners.forEach((listener) => listener());
+            });
+        }
+    });
+}
 
 let listenerMap: Map<string, (() => void)[]> = new Map();
 

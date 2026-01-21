@@ -3,8 +3,7 @@ import dataJson from "../../public/data.json";
 
 const data = dataJson as unknown as DataFormat;
 
-export const BASE_URL =
-    import.meta.env.PUBLIC_BASE_URL || "https://models.vantage.sh";
+export const BASE_URL = import.meta.env.PUBLIC_BASE_URL || "https://models.vantage.sh";
 
 /**
  * Convert company name to URL-friendly slug
@@ -20,10 +19,7 @@ export function slugifyCompany(company: string): string {
 /**
  * Convert slug back to company name by finding matching company
  */
-export function unslugifyCompany(
-    slug: string,
-    companies: string[]
-): string | undefined {
+export function unslugifyCompany(slug: string, companies: string[]): string | undefined {
     return companies.find((company) => slugifyCompany(company) === slug);
 }
 
@@ -57,20 +53,14 @@ export function getImageModelCompanies(): { company: string; slug: string }[] {
  * Get all LLM models for a specific company
  */
 export function getModelsByCompany(company: string): [string, Model][] {
-    return Object.entries(data.models).filter(
-        ([_, model]) => model.company === company
-    );
+    return Object.entries(data.models).filter(([_, model]) => model.company === company);
 }
 
 /**
  * Get all image models for a specific company
  */
-export function getImageModelsByCompany(
-    company: string
-): [string, ImageModel][] {
-    return Object.entries(data.imageModels).filter(
-        ([_, model]) => model.company === company
-    );
+export function getImageModelsByCompany(company: string): [string, ImageModel][] {
+    return Object.entries(data.imageModels).filter(([_, model]) => model.company === company);
 }
 
 /**

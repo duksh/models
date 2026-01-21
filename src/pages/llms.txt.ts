@@ -1,9 +1,5 @@
 import type { APIRoute } from "astro";
-import {
-    BASE_URL,
-    getLLMCompanies,
-    getImageModelCompanies,
-} from "@/src/lib/llmsTxt";
+import { BASE_URL, getLLMCompanies, getImageModelCompanies } from "@/src/lib/llmsTxt";
 
 export const prerender = true;
 

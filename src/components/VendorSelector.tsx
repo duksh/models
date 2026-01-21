@@ -352,7 +352,15 @@ function VendorItems({
                 <div className="mb-4">
                     <label className="block mb-2 font-medium">Select Region:</label>
                     <select
-                        value={typeof region === "string" ? region : region && "eu" in region ? "eu" : region && "usa" in region ? "usa" : ""}
+                        value={
+                            typeof region === "string"
+                                ? region
+                                : region && "eu" in region
+                                  ? "eu"
+                                  : region && "usa" in region
+                                    ? "usa"
+                                    : ""
+                        }
                         onChange={(e) => {
                             const val = e.target.value;
                             if (val === "eu") {

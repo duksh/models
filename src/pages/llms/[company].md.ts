@@ -100,9 +100,7 @@ function generateModelMarkdown(modelId: string, model: Model): string {
         lines.push("| Region | Input | Output | Cached Input | Cached Output |");
         lines.push("|--------|-------|--------|--------------|---------------|");
 
-        for (const [regionCode, pricing] of Object.entries(
-            vendorInfo.regionPricing
-        )) {
+        for (const [regionCode, pricing] of Object.entries(vendorInfo.regionPricing)) {
             const regionName = getRegionName(vendorInfo.vendorRef, regionCode);
             const [input, output, cachedInput, cachedOutput] = pricing;
             lines.push(

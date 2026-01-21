@@ -36,12 +36,8 @@ function generateModelMarkdown(modelId: string, model: ImageModel): string {
     lines.push("");
     lines.push("| Property | Value |");
     lines.push("|----------|-------|");
-    lines.push(
-        `| Supported Resolutions | ${model.supportedResolutions.join(", ")} |`
-    );
-    lines.push(
-        `| Negative Prompts | ${model.supportsNegativePrompts ? "Yes" : "No"} |`
-    );
+    lines.push(`| Supported Resolutions | ${model.supportedResolutions.join(", ")} |`);
+    lines.push(`| Negative Prompts | ${model.supportsNegativePrompts ? "Yes" : "No"} |`);
     lines.push(`| Self-hostable | ${model.selfhostable ? "Yes" : "No"} |`);
     lines.push("");
 
@@ -56,9 +52,7 @@ function generateModelMarkdown(modelId: string, model: ImageModel): string {
         lines.push(`#### ${vendorName}`);
         lines.push("");
 
-        for (const [regionCode, tiers] of Object.entries(
-            vendorInfo.regionPricing
-        )) {
+        for (const [regionCode, tiers] of Object.entries(vendorInfo.regionPricing)) {
             const regionName = getRegionName(vendorInfo.vendorRef, regionCode);
             lines.push(`**${regionName}**`);
             lines.push("");
@@ -66,9 +60,7 @@ function generateModelMarkdown(modelId: string, model: ImageModel): string {
             lines.push("|------------|-------|");
 
             for (const tier of tiers) {
-                lines.push(
-                    `| ${tier.resolution} | ${formatImagePrice(tier.pricePerImage)} |`
-                );
+                lines.push(`| ${tier.resolution} | ${formatImagePrice(tier.pricePerImage)} |`);
             }
             lines.push("");
         }
@@ -91,9 +83,7 @@ export const GET: APIRoute = ({ props }) => {
     ];
 
     // Sort models by name
-    const sortedModels = models.sort((a, b) =>
-        a[1].cleanName.localeCompare(b[1].cleanName)
-    );
+    const sortedModels = models.sort((a, b) => a[1].cleanName.localeCompare(b[1].cleanName));
 
     for (const [modelId, model] of sortedModels) {
         lines.push(generateModelMarkdown(modelId, model));

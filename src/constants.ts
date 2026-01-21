@@ -16,7 +16,7 @@ const llmVendors = {
     JOIN vendors ON models_vendors.vendor_id = vendors.vendor_id
     WHERE models_vendors.model_id = ?`,
     columnExplicitlySetDataTypes: {},
-}
+};
 
 export const defaultQueries = [
     singleValue("company", "Company"),

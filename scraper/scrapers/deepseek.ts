@@ -87,6 +87,7 @@ export default async function scrapeDeepseekData(fmt: DataFormat) {
         cleanName: "DeepSeek API",
         learnMoreUrl: "https://www.deepseek.com",
         euOrUKRegions: [],
+        usaRegions: [],
         regionCleanNames: {
             "": {
                 global: "Global",

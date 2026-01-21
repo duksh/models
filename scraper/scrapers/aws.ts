@@ -201,6 +201,7 @@ export default async function scrapeAwsData(fmt: DataFormat) {
         cleanName: "AWS Bedrock",
         learnMoreUrl: "https://aws.amazon.com/bedrock",
         euOrUKRegions: Object.keys(regions).filter((code) => code.startsWith("eu-")),
+        usaRegions: Object.keys(regions).filter((code) => code.startsWith("us-")),
         regionCleanNames: {
             "": regions,
         },

@@ -97,6 +97,7 @@ export default async function scrapeIbmData(fmt: DataFormat) {
         cleanName: "IBM watsonx.ai",
         learnMoreUrl: "https://www.ibm.com/products/watsonx-ai",
         euOrUKRegions: ["eu-de", "eu-gb"],
+        usaRegions: ["us-south", "us-east"],
         regionCleanNames: {
             "": {
                 "us-south": "US South (Dallas)",

@@ -117,6 +117,7 @@ export default async function scrapeAnthropicData(fmt: DataFormat) {
         cleanName: "Anthropic API",
         learnMoreUrl: "https://www.anthropic.com",
         euOrUKRegions: [],
+        usaRegions: [],
         regionCleanNames: {
             "": {
                 global: "Global",

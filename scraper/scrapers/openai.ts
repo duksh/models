@@ -113,6 +113,7 @@ export default async function scrapeOpenaiData(fmt: DataFormat) {
         cleanName: "OpenAI API",
         learnMoreUrl: "https://openai.com",
         euOrUKRegions: [],
+        usaRegions: [],
         regionCleanNames: {
             "": {
                 global: "Global",

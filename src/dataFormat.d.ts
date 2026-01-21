@@ -96,6 +96,7 @@ type VendorInfo = {
         };
     };
     euOrUKRegions: string[];
+    usaRegions: string[];
 };
 
 export type DataFormat = {

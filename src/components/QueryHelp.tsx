@@ -90,6 +90,9 @@ export default function QueryHelp({ showParameterHelp = true }: { showParameterH
                                 <span>
                                     <code>eu_or_uk_regions</code>
                                 </span>
+                                <span>
+                                    <code>usa_regions</code>
+                                </span>
                             </div>
                         </div>
 

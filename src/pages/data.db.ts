@@ -31,7 +31,7 @@ export const GET: APIRoute = () => {
 
         // Add the vendors
         const vendorsPrep = db.prepare(
-            "INSERT INTO vendors (vendor_id, clean_name, learn_more_url, eu_or_uk_regions) VALUES (?, ?, ?, ?)"
+            "INSERT INTO vendors (vendor_id, clean_name, learn_more_url, eu_or_uk_regions, usa_regions) VALUES (?, ?, ?, ?, ?)"
         );
         const vendorRegionsPrep = db.prepare(
             "INSERT INTO vendor_regions (vendor_id, region_code, category, region_name) VALUES (?, ?, ?, ?)"
@@ -42,6 +42,7 @@ export const GET: APIRoute = () => {
                 vendorData.cleanName,
                 vendorData.learnMoreUrl,
                 JSON.stringify(vendorData.euOrUKRegions),
+                JSON.stringify(vendorData.usaRegions),
             ]);
             for (const [categoryOrEmpty, regions] of Object.entries(vendorData.regionCleanNames)) {
                 const category = categoryOrEmpty === "" ? null : categoryOrEmpty;

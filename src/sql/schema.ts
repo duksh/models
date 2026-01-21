@@ -2,7 +2,8 @@ export default `CREATE TABLE vendors (
     vendor_id TEXT PRIMARY KEY,
     clean_name TEXT NOT NULL,
     learn_more_url TEXT,
-    eu_or_uk_regions JSON NOT NULL
+    eu_or_uk_regions JSON NOT NULL,
+    usa_regions JSON NOT NULL
 );
 
 CREATE TABLE vendor_regions (

@@ -99,6 +99,7 @@ export default async function scrapeAlibabaData(fmt: DataFormat) {
         cleanName: "Alibaba Cloud Model Studio",
         learnMoreUrl: "https://www.alibabacloud.com/product/model-studio",
         euOrUKRegions: [],
+        usaRegions: [],
         regionCleanNames: {
             "": {
                 "cn-shanghai": "China (Shanghai)",

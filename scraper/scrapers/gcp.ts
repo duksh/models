@@ -103,6 +103,7 @@ export default async function scrapeGcpData(fmt: DataFormat) {
         cleanName: "Google Cloud Vertex AI",
         learnMoreUrl: "https://cloud.google.com/vertex-ai",
         euOrUKRegions: ["europe-west1", "europe-west4"],
+        usaRegions: ["us-central1", "us-east4"],
         regionCleanNames: {
             "": {
                 "us-central1": "US Central (Iowa)",

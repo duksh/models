@@ -2,6 +2,8 @@ import React from "react";
 import type { ColumnDataType, ColumnQuery } from "./Table";
 import type { VendorInfo } from "../dataFormat";
 
+type RegionBucket = { eu: true } | { usa: true };
+
 type VendorQueryBuilder = {
     name: string;
 } & (
@@ -10,7 +12,7 @@ type VendorQueryBuilder = {
           queryBuilder: (
               vendorSlug: string | null,
               vendorName: string | null,
-              region: null | string | { eu: true }
+              region: null | string | RegionBucket
           ) => [string, { [key: string]: ColumnDataType }];
       }
     | {
@@ -56,15 +58,17 @@ function vendorAndRegionSelectAsWrapper(
     return (
         vendorSlug: string | null,
         vendorName: string | null,
-        region: null | string | { eu: true }
+        region: null | string | RegionBucket
     ) => {
         let formatted: string;
         if (region === null) {
             formatted = "Average";
         } else if (typeof region === "string") {
             formatted = region;
-        } else {
+        } else if ("eu" in region) {
             formatted = "EU / UK Regions";
+        } else {
+            formatted = "USA";
         }
         let niceNameReplaced: string;
         if (vendorName === null) {
@@ -88,11 +92,17 @@ function vendorAndRegionSelectAsWrapper(
             query = `SELECT ${key} AS \`${niceNameReplaced}\`
     FROM models_vendors_regions
     WHERE ${vendorIdQueryPart}model_id = ? AND region_code = '${region}'`;
-        } else if (region.eu) {
+        } else if ("eu" in region) {
             query = `SELECT AVG(models_vendors_regions.${key}) AS \`${niceNameReplaced}\`
     FROM models_vendors_regions JOIN vendors ON models_vendors_regions.vendor_id = vendors.vendor_id
     WHERE ${vendorIdQueryPart}models_vendors_regions.model_id = ? AND EXISTS (
         SELECT 1 FROM json_each(vendors.eu_or_uk_regions) WHERE value = models_vendors_regions.region_code
+    )`;
+        } else if ("usa" in region) {
+            query = `SELECT AVG(models_vendors_regions.${key}) AS \`${niceNameReplaced}\`
+    FROM models_vendors_regions JOIN vendors ON models_vendors_regions.vendor_id = vendors.vendor_id
+    WHERE ${vendorIdQueryPart}models_vendors_regions.model_id = ? AND EXISTS (
+        SELECT 1 FROM json_each(vendors.usa_regions) WHERE value = models_vendors_regions.region_code
     )`;
         } else {
             throw new Error("Invalid region");
@@ -274,7 +284,7 @@ function VendorItems({
         vendorInfo = vendors[vendorSlug];
     }
     const [queryBuilderIndex, setQueryBuilderIndex] = React.useState<number>(-1);
-    const [region, setRegion] = React.useState<string | { eu: true } | null>(null);
+    const [region, setRegion] = React.useState<string | RegionBucket | null>(null);
     const [disabled, setDisabled] = React.useState(true);
 
     // Use appropriate query builders based on view
@@ -342,11 +352,13 @@ function VendorItems({
                 <div className="mb-4">
                     <label className="block mb-2 font-medium">Select Region:</label>
                     <select
-                        value={typeof region === "string" ? region : region ? "eu" : ""}
+                        value={typeof region === "string" ? region : region && "eu" in region ? "eu" : region && "usa" in region ? "usa" : ""}
                         onChange={(e) => {
                             const val = e.target.value;
                             if (val === "eu") {
                                 setRegion({ eu: true });
+                            } else if (val === "usa") {
+                                setRegion({ usa: true });
                             } else if (val) {
                                 setRegion(val);
                             } else {
@@ -376,6 +388,10 @@ function VendorItems({
                                 );
                             }
                         )}
+                        {!vendorInfo ||
+                            (vendorInfo.usaRegions.length > 0 && (
+                                <option value="usa">USA (Average)</option>
+                            ))}
                         {!vendorInfo ||
                             (vendorInfo.euOrUKRegions.length > 0 && (
                                 <option value="eu">EU / UK Regions (Average)</option>

@@ -105,6 +105,7 @@ export default async function scrapeMistralData(fmt: DataFormat) {
         cleanName: "Mistral AI",
         learnMoreUrl: "https://mistral.ai",
         euOrUKRegions: ["global"], // Mistral is EU-based (France)
+        usaRegions: [],
         regionCleanNames: {
             "": {
                 global: "Global",

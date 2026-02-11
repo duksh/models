@@ -79,9 +79,14 @@ function SQLModalInner({ exit, setQueries, firstId }: SQLModalProps) {
     );
 
     return (
-        <form className="block max-w-lg" onSubmit={submit}>
-            {output && <output>{output}</output>}
-            <React.Suspense fallback={<></>}>
+        <form className="block" onSubmit={submit}>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Create a new column using a custom SQL query. The query will define how values for
+                this column are calculated and displayed.
+            </p>
+            {output && <output className="block mb-3">{output}</output>}
+            <label className="block text-sm font-medium mb-1.5">Query</label>
+            <React.Suspense fallback={<div className="h-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />}>
                 <CodeMirror
                     value={valueRef.current}
                     maxHeight="300px"
@@ -90,9 +95,9 @@ function SQLModalInner({ exit, setQueries, firstId }: SQLModalProps) {
                     }}
                 />
             </React.Suspense>
-            <ColumnCustomTypeSelector columnCustomTypes={columnCustomTypes.current} />
             <QueryHelp />
-            <Button className="mt-4">Add Columns</Button>
+            <ColumnCustomTypeSelector columnCustomTypes={columnCustomTypes.current} />
+            <Button className="mt-4">Add Column</Button>
         </form>
     );
 }
@@ -101,23 +106,20 @@ const SQLModal = React.forwardRef<HTMLDialogElement, SQLModalProps>((props, ref)
     return (
         <dialog
             ref={ref}
-            className="m-auto p-0 rounded-md max-w-lg bg-white dark:bg-gray-800 dark:text-gray-100 backdrop:bg-black/50"
+            className="m-auto p-0 rounded-lg max-w-lg w-full bg-white dark:bg-gray-800 dark:text-gray-100 backdrop:bg-black/50 shadow-xl"
             onClick={() => props.exit()}
             onClose={() => props.exit()}
         >
             <div onClick={(e) => e.stopPropagation()}>
-                <div className="bg-white dark:bg-gray-800 p-4 block w-full h-full">
-                    <header>
-                        <div className="flex gap-2 items-center">
-                            <form method="dialog">
-                                <button type="submit" className="py-4 rounded-md">
-                                    <XIcon className="w-5 h-5" />
-                                </button>
-                            </form>
-                            <h2 className="text-lg font-bold">Add SQL Columns</h2>
-                        </div>
+                <div className="bg-white dark:bg-gray-800 p-5 block w-full h-full">
+                    <header className="flex gap-2 items-center mb-4">
+                        <form method="dialog">
+                            <button type="submit" className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
+                                <XIcon className="w-5 h-5" />
+                            </button>
+                        </form>
+                        <h2 className="text-lg font-bold">Add SQL Columns</h2>
                     </header>
-                    <hr className="mt-2 mb-4 border-gray-200 dark:border-gray-600" />
                     <SQLModalInner {...props} />
                 </div>
             </div>

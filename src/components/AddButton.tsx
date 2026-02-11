@@ -1,59 +1,30 @@
 import React from "react";
 import type { ColumnQuery, LoadedValues } from "./Table";
-import { ToolCase, Warehouse, Wrench } from "lucide-react";
+import { XIcon, Code2Icon } from "lucide-react";
 import SQLModal from "./SQLModal";
 import DefaultSelector from "./DefaultSelector";
 import VendorSelector from "./VendorSelector";
 import type { VendorInfo } from "../dataFormat";
 import { useStateItem } from "../state";
 
-function SelectionMode({
-    queries,
-    setQueries,
-    exit,
+export default function AddButton({
+    isOpen,
+    onClose,
     firstId,
     loadedValuesRows,
     vendors,
-    externalClickHandler,
     modelType,
 }: {
-    queries: ColumnQuery[];
-    setQueries: (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => void;
-    exit: () => void;
+    isOpen: boolean;
+    onClose: () => void;
     firstId: string;
     loadedValuesRows: Map<string, LoadedValues>;
     vendors: Record<string, VendorInfo>;
-    externalClickHandler: React.RefObject<(() => void) | null>;
     modelType: "llm" | "image";
 }) {
-    const [mode, setMode] = React.useState<null | "default" | "vendor">(null);
+    const [queries, setQueries] = useStateItem("queries", modelType === "llm" ? "/" : "/image-models");
+    const [activeTab, setActiveTab] = React.useState<"default" | "vendor">("default");
     const modalRef = React.useRef<HTMLDialogElement>(null);
-    const holderRef = React.useRef<HTMLDivElement>(null);
-    const [changes, setChanges] = React.useState(0);
-
-    const scrollIntoView = React.useCallback(() => {
-        if (holderRef.current) {
-            holderRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    }, []);
-
-    React.useEffect(() => {
-        externalClickHandler.current = scrollIntoView;
-    }, []);
-
-    React.useLayoutEffect(() => {
-        scrollIntoView();
-    }, [changes]);
-
-    const closer = (
-        <button
-            className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
-            onClick={exit}
-            aria-label="Close selection mode"
-        >
-            ✕
-        </button>
-    );
 
     const setQueriesAndPurgeLoadedValues = React.useCallback(
         (cb: (prev: ColumnQuery[]) => ColumnQuery[]) => {
@@ -63,134 +34,84 @@ function SelectionMode({
         [setQueries, loadedValuesRows]
     );
 
-    switch (mode) {
-        case "default":
-            return (
-                <div ref={holderRef} className="flex pr-2">
-                    {closer}
-                    <DefaultSelector
-                        queries={queries}
-                        setQueries={setQueriesAndPurgeLoadedValues}
-                        modelType={modelType}
-                    />
-                </div>
-            );
-        case "vendor":
-            return (
-                <div ref={holderRef} className="flex pr-2">
-                    {closer}
-                    <VendorSelector
-                        setQueries={setQueriesAndPurgeLoadedValues}
-                        exit={exit}
-                        vendors={vendors}
-                        modelType={modelType}
-                    />
-                </div>
-            );
-    }
+    if (!isOpen) return null;
 
     return (
-        <div ref={holderRef} className="flex mt-2 pr-2">
+        <>
             <SQLModal
                 ref={modalRef}
                 setQueries={setQueriesAndPurgeLoadedValues}
-                exit={exit}
+                exit={() => {}}
                 firstId={firstId}
             />
-            {closer}
-            <div className="ml-4 flex flex-col gap-2">
-                <button
-                    className="py-1 px-2 flex items-center border border-gray-400 dark:border-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-                    onClick={() => {
-                        setMode("default");
-                        setChanges((c) => c + 1);
-                    }}
-                >
-                    <ToolCase className="inline mr-1" size={16} />
-                    Default Queries
-                </button>
-                <button
-                    className="py-1 px-2 flex items-center border border-gray-400 dark:border-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-                    onClick={() => {
-                        setMode("vendor");
-                        setChanges((c) => c + 1);
-                    }}
-                >
-                    <Warehouse className="inline mr-1" size={16} />
-                    Vendor Queries
-                </button>
-                <button
-                    className="py-1 px-2 flex items-center border border-gray-400 dark:border-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-                    onClick={() => {
-                        modalRef.current?.showModal();
-                        setChanges((c) => c + 1);
-                    }}
-                >
-                    <Wrench className="inline mr-1" size={16} />
-                    Custom SQL
-                </button>
+            <div className="w-80 shrink-0 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-y-auto">
+                <div className="flex items-center justify-between p-3 pb-0">
+                    <h3 className="font-semibold text-sm">Add Query</h3>
+                    <div className="flex items-center gap-2">
+                        <button
+                            className="text-xs flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                            onClick={() => {
+                                modalRef.current?.showModal();
+                            }}
+                        >
+                            <Code2Icon className="w-3.5 h-3.5" />
+                            Custom SQL
+                        </button>
+                        <button
+                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                            onClick={onClose}
+                        >
+                            <XIcon className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex border-b border-gray-200 dark:border-gray-700 mt-2">
+                    <button
+                        className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                            activeTab === "default"
+                                ? "border-b-2 border-[#6742d6] text-[#6742d6] dark:border-purple-400 dark:text-purple-300"
+                                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        }`}
+                        onClick={() => setActiveTab("default")}
+                    >
+                        Default Queries
+                    </button>
+                    <button
+                        className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                            activeTab === "vendor"
+                                ? "border-b-2 border-[#6742d6] text-[#6742d6] dark:border-purple-400 dark:text-purple-300"
+                                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        }`}
+                        onClick={() => setActiveTab("vendor")}
+                    >
+                        Vendor Queries
+                    </button>
+                </div>
+
+                <div className="p-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                        {activeTab === "default"
+                            ? "Add a column using one of the available default queries. Select a query from the list to turn it on or off."
+                            : "Add a column using vendor-specific data. Select a vendor and data type to add."}
+                    </p>
+
+                    {activeTab === "default" ? (
+                        <DefaultSelector
+                            queries={queries}
+                            setQueries={setQueriesAndPurgeLoadedValues}
+                            modelType={modelType}
+                        />
+                    ) : (
+                        <VendorSelector
+                            setQueries={setQueriesAndPurgeLoadedValues}
+                            exit={onClose}
+                            vendors={vendors}
+                            modelType={modelType}
+                        />
+                    )}
+                </div>
             </div>
-        </div>
-    );
-}
-
-export default function AddButton({
-    firstId,
-    loadedValuesRows,
-    vendors,
-    modelType,
-}: {
-    firstId: string;
-    loadedValuesRows: Map<string, LoadedValues>;
-    vendors: Record<string, VendorInfo>;
-    modelType: "llm" | "image";
-}) {
-    const [queries, setQueries] = useStateItem("queries", modelType === "llm" ? "/" : "/image-models");
-    const [selectionMode, setSelectionMode] = React.useState(false);
-    const externalClickHandler = React.useRef<() => void>(null);
-
-    let innerContent = (
-        <button
-            className={`py-1 px-2 mt-2 mr-2 border border-gray-400 dark:border-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${selectionMode ? "hidden" : ""}`}
-            onClick={() => {
-                setSelectionMode((old) => {
-                    if (old) {
-                        // This is a external click, so we need to call the handler
-                        externalClickHandler.current?.();
-                    }
-                    return true;
-                });
-            }}
-            id="add-button"
-        >
-            + Add Query
-        </button>
-    );
-
-    if (selectionMode) {
-        innerContent = (
-            <>
-                {innerContent}
-                <SelectionMode
-                    queries={queries}
-                    setQueries={setQueries}
-                    loadedValuesRows={loadedValuesRows}
-                    exit={() => {
-                        setSelectionMode(false);
-                        externalClickHandler.current = null;
-                    }}
-                    firstId={firstId}
-                    vendors={vendors}
-                    externalClickHandler={externalClickHandler}
-                    modelType={modelType}
-                />
-            </>
-        );
-    }
-
-    return (
-        <div aria-atomic="true" aria-live="assertive">
-            {innerContent}
-        </div>
+        </>
     );
 }

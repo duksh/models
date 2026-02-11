@@ -112,7 +112,7 @@ function RunQueryModal({ onClose }: { onClose: () => void }) {
                 <header className="flex items-center gap-2 p-4 border-b border-gray-200 dark:border-gray-700">
                     <button
                         onClick={onClose}
-                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+                        className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
                     >
                         <XIcon className="w-5 h-5" />
                     </button>
@@ -120,6 +120,10 @@ function RunQueryModal({ onClose }: { onClose: () => void }) {
                 </header>
 
                 <div className="p-4 overflow-auto flex-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        Run this SQL query to preview the results before applying it to a column.
+                    </p>
+                    <label className="block text-sm font-medium mb-1.5">Query</label>
                     <React.Suspense
                         fallback={
                             <div className="h-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />
@@ -176,8 +180,9 @@ export default function RunQueryButton() {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="px-4 py-1.5 rounded text-sm font-medium transition-colors text-white/80 hover:text-white hover:bg-[#7a52e6]"
+                className="flex items-center gap-1.5 px-2 py-1.5 rounded text-sm font-medium transition-colors text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
+                <PlayIcon className="w-3.5 h-3.5" />
                 Run Query
             </button>
             {isOpen && <RunQueryModal onClose={() => setIsOpen(false)} />}

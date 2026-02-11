@@ -2,6 +2,21 @@ import React from "react";
 import { defaultQueries, defaultImageQueries } from "../constants";
 import type { ColumnQuery } from "./Table";
 
+const QUERY_COLORS = [
+    "#7c3aed",
+    "#f97316",
+    "#eab308",
+    "#22c55e",
+    "#ef4444",
+    "#3b82f6",
+    "#ec4899",
+    "#14b8a6",
+    "#6366f1",
+    "#f59e0b",
+    "#06b6d4",
+    "#84cc16",
+];
+
 export default function DefaultSelector({
     queries,
     setQueries,
@@ -24,10 +39,8 @@ export default function DefaultSelector({
             const dq = availableDefaults.find((dq) => dq.name === name);
             if (!dq) return;
             if (checkedQueries.includes(name)) {
-                // Unchecked
                 setQueries((prev) => prev.filter((q) => q.query !== dq.query));
             } else {
-                // Checked
                 setQueries((prev) => {
                     const filter = prev.filter((q) => q.query !== dq.query);
                     return [
@@ -45,23 +58,42 @@ export default function DefaultSelector({
     );
 
     return (
-        <div className="p-4">
-            <h2 className="text-lg font-medium mb-4">Select Default Columns</h2>
-            <form>
-                {availableDefaults.map((dq) => (
-                    <div key={dq.name} className="mb-2">
-                        <label className="inline-flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={checkedQueries.includes(dq.name)}
-                                onChange={() => handleChange(dq.name)}
-                                className="form-checkbox h-5 w-5 text-blue-600 dark:bg-gray-800 dark:border-gray-600"
-                            />
-                            <span className="ml-2">{dq.name}</span>
-                        </label>
-                    </div>
-                ))}
-            </form>
+        <div className="flex flex-col gap-0.5">
+            {availableDefaults.map((dq, idx) => {
+                const isChecked = checkedQueries.includes(dq.name);
+                const color = QUERY_COLORS[idx % QUERY_COLORS.length];
+                return (
+                    <label
+                        key={dq.name}
+                        className="flex items-center gap-2.5 py-1.5 px-1.5 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded transition-colors"
+                    >
+                        <span
+                            className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center border"
+                            style={{
+                                backgroundColor: isChecked ? color : "transparent",
+                                borderColor: color,
+                            }}
+                        >
+                            {isChecked && (
+                                <svg
+                                    className="w-3 h-3 text-white"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={3}
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M5 13l4 4L19 7"
+                                    />
+                                </svg>
+                            )}
+                        </span>
+                        <span className="text-sm">{dq.name}</span>
+                    </label>
+                );
+            })}
         </div>
     );
 }

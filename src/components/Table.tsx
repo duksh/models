@@ -11,10 +11,12 @@ import Column from "./Column";
 import AddButton from "./AddButton";
 import SQLEditorButton from "./SQLEditorButton";
 import type { VendorInfo } from "../dataFormat";
-import { useStateItem } from "../state";
+import { useStateItem, clearState } from "../state";
 import Link from "./Link";
-import PortalRoot from "./PortalRoot";
-import ReactDOM from "react-dom";
+import ModelTypeTabs from "./ModelTypeTabs";
+import CurrencyPicker from "./CurrencyPicker";
+import RunQueryButton from "./RunQueryButton";
+import { XIcon, PlusIcon, PlayIcon } from "lucide-react";
 
 export type ColumnDataType = "boolean" | "currency" | "country";
 
@@ -418,6 +420,52 @@ function NameFilter({
     );
 }
 
+function Toolbar({
+    modelType,
+    addQueryOpen,
+    setAddQueryOpen,
+}: {
+    modelType: "llm" | "image";
+    addQueryOpen: boolean;
+    setAddQueryOpen: (open: boolean) => void;
+}) {
+    return (
+        <div className="flex items-end justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0 gap-4">
+            <div className="flex items-end gap-6">
+                <div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Output</span>
+                    <ModelTypeTabs />
+                </div>
+                <div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Currency</span>
+                    <CurrencyPicker modelType={modelType} />
+                </div>
+            </div>
+            <div className="flex items-center gap-1">
+                <button
+                    onClick={() => clearState()}
+                    className="flex items-center gap-1 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                    <XIcon className="w-3.5 h-3.5" />
+                    Clear Filters
+                </button>
+                <RunQueryButton />
+                <button
+                    onClick={() => setAddQueryOpen(!addQueryOpen)}
+                    className={`flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                        addQueryOpen
+                            ? "bg-[#6742d6] text-white"
+                            : "border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                >
+                    <PlusIcon className="w-3.5 h-3.5" />
+                    Add Query
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function Table({
     models,
     vendors,
@@ -439,6 +487,7 @@ export default function Table({
         () => [new Map(models.map(({ id }) => [id, null]))]
     );
     const [currentSorting, setCurrentSorting] = useStateItem("currentSorting", path);
+    const [addQueryOpen, setAddQueryOpen] = React.useState(false);
 
     // Reset state when modelType changes
     React.useEffect(() => {
@@ -459,101 +508,102 @@ export default function Table({
         return v.filter(({ name }) => name.toLowerCase().includes(nameFilter.toLowerCase()));
     }, [models, nameFilter, queries, queryColumns, loadedValuesRows, currentSorting]);
 
-    const portalRoot = ReactDOM.createPortal(
-        <PortalRoot modelType={modelType} />,
-        document.getElementById("portal-root")!
-    );
-
     return (
-        <>
-            {portalRoot}
-            <div className="flex-1 overflow-x-auto h-full">
-                <div className="flex items-start min-w-max">
-                    <table className="h-full">
-                        <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10 shadow-[0_2px_0_0_rgb(209,213,219)] dark:shadow-[0_2px_0_0_rgb(75,85,99)]">
-                            <tr>
-                                <th className="pb-1 relative bg-white dark:bg-gray-900 align-bottom">
-                                    <NameFilter
-                                        nameFilter={nameFilter}
-                                        setNameFilter={setNameFilter}
-                                    />
-                                    <div className="absolute top-0 right-0 w-1 h-full bg-gray-200 dark:bg-gray-700 hover:opacity-50 transition-all duration-150" />
-                                </th>
-                                {queries.map((q, i) => (
-                                    <TableHeader
-                                        key={i}
-                                        queryIdx={i}
-                                        query={q}
-                                        updateQuery={(rerunQuery: boolean) => {
-                                            const newQueries = [...queries];
-                                            newQueries[i] = q;
-                                            setQueries(newQueries);
-                                            if (rerunQuery) {
-                                                setCurrentSorting((old) => {
-                                                    if (old?.[0] === i) {
-                                                        return null;
-                                                    }
-                                                    return [i, q.query, true];
+        <div className="flex flex-col h-full">
+            <Toolbar
+                modelType={modelType}
+                addQueryOpen={addQueryOpen}
+                setAddQueryOpen={setAddQueryOpen}
+            />
+            <div className="flex flex-1 overflow-hidden">
+                <div className="flex-1 overflow-x-auto">
+                    <div className="flex items-start min-w-max">
+                        <table className="h-full">
+                            <thead className="sticky top-0 bg-white dark:bg-gray-900 z-10 shadow-[0_2px_0_0_rgb(209,213,219)] dark:shadow-[0_2px_0_0_rgb(75,85,99)]">
+                                <tr>
+                                    <th className="pb-1 relative bg-white dark:bg-gray-900 align-bottom">
+                                        <NameFilter
+                                            nameFilter={nameFilter}
+                                            setNameFilter={setNameFilter}
+                                        />
+                                        <div className="absolute top-0 right-0 w-1 h-full bg-gray-200 dark:bg-gray-700 hover:opacity-50 transition-all duration-150" />
+                                    </th>
+                                    {queries.map((q, i) => (
+                                        <TableHeader
+                                            key={i}
+                                            queryIdx={i}
+                                            query={q}
+                                            updateQuery={(rerunQuery: boolean) => {
+                                                const newQueries = [...queries];
+                                                newQueries[i] = q;
+                                                setQueries(newQueries);
+                                                if (rerunQuery) {
+                                                    setCurrentSorting((old) => {
+                                                        if (old?.[0] === i) {
+                                                            return null;
+                                                        }
+                                                        return [i, q.query, true];
+                                                    });
+                                                    setQueryColumns((x) => {
+                                                        const newQueryColumns = [...x];
+                                                        newQueryColumns[i] = null;
+                                                        return newQueryColumns;
+                                                    });
+                                                }
+                                            }}
+                                            deleteQuery={() => {
+                                                // Handle the map
+                                                loadedValuesRows[0].forEach((v) => {
+                                                    v?.splice(i, 1);
                                                 });
-                                                setQueryColumns((x) => {
-                                                    const newQueryColumns = [...x];
-                                                    newQueryColumns[i] = null;
-                                                    return newQueryColumns;
-                                                });
-                                            }
-                                        }}
-                                        deleteQuery={() => {
-                                            // Handle the map
-                                            loadedValuesRows[0].forEach((v) => {
-                                                v?.splice(i, 1);
-                                            });
-                                            setLoadedValuesRows([...loadedValuesRows]);
+                                                setLoadedValuesRows([...loadedValuesRows]);
 
-                                            // Handle deletion of a query from that array
-                                            const newQueries = queries.filter(
-                                                (_, idx) => idx !== i
-                                            );
-                                            setQueries(newQueries);
-                                            setQueryColumns((x) => x.filter((_, idx) => idx !== i));
+                                                // Handle deletion of a query from that array
+                                                const newQueries = queries.filter(
+                                                    (_, idx) => idx !== i
+                                                );
+                                                setQueries(newQueries);
+                                                setQueryColumns((x) => x.filter((_, idx) => idx !== i));
+                                            }}
+                                            queryColumns={queryColumns[i] || []}
+                                            loadedValuesPtr={loadedValuesRows}
+                                            firstId={models[0]?.id || ""}
+                                        />
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody className="h-full overflow-y-scroll">
+                                {sortedIdsAndNames.map(({ id, name }) => (
+                                    <TableRow
+                                        id={id}
+                                        key={`${modelType}-${id}`}
+                                        name={name}
+                                        queryColumns={queryColumns}
+                                        setQueryColumns={setQueryColumns}
+                                        loadedValues={loadedValuesRows[0].get(id) || null}
+                                        setLoadedValues={(vals) => {
+                                            setLoadedValuesRows((prev) => {
+                                                prev[0].set(id, vals);
+                                                return [prev[0]];
+                                            });
                                         }}
-                                        queryColumns={queryColumns[i] || []}
-                                        loadedValuesPtr={loadedValuesRows}
-                                        firstId={models[0]?.id || ""}
+                                        queries={queries}
+                                        modelType={modelType}
                                     />
                                 ))}
-                            </tr>
-                        </thead>
-                        <tbody className="h-full overflow-y-scroll">
-                            {sortedIdsAndNames.map(({ id, name }) => (
-                                <TableRow
-                                    id={id}
-                                    key={`${modelType}-${id}`}
-                                    name={name}
-                                    queryColumns={queryColumns}
-                                    setQueryColumns={setQueryColumns}
-                                    loadedValues={loadedValuesRows[0].get(id) || null}
-                                    setLoadedValues={(vals) => {
-                                        setLoadedValuesRows((prev) => {
-                                            prev[0].set(id, vals);
-                                            return [prev[0]];
-                                        });
-                                    }}
-                                    queries={queries}
-                                    modelType={modelType}
-                                />
-                            ))}
-                        </tbody>
-                    </table>
-                    <div className="ml-4 shrink-0 sticky top-0 self-start">
-                        <AddButton
-                            loadedValuesRows={loadedValuesRows[0]}
-                            firstId={models[0]?.id || ""}
-                            vendors={vendors}
-                            modelType={modelType}
-                        />
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+                <AddButton
+                    isOpen={addQueryOpen}
+                    onClose={() => setAddQueryOpen(false)}
+                    loadedValuesRows={loadedValuesRows[0]}
+                    firstId={models[0]?.id || ""}
+                    vendors={vendors}
+                    modelType={modelType}
+                />
             </div>
-        </>
+        </div>
     );
 }

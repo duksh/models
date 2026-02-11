@@ -436,7 +436,7 @@ export default function VendorSelector({
     }, []);
 
     return (
-        <div className="p-4 w-full max-w-md">
+        <div className="w-full">
             <select
                 value={selectedVendorSlug}
                 onChange={handleVendorChange}

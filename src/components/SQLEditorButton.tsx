@@ -35,16 +35,13 @@ export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEdit
         async (e: React.FormEvent) => {
             e.preventDefault();
 
-            // Get old row data before changing the query (for migration detection)
             let oldRow: { [column: string]: any } | null = null;
             try {
                 oldRow = await loadSingleRow(query.query, firstId);
             } catch {
-                // If old query fails, we can't migrate - proceed anyway
                 oldRow = null;
             }
 
-            // Test the new query
             const res = await testQuery(valueRef.current, firstId);
             if (!res.ok) {
                 setOutput(
@@ -53,12 +50,10 @@ export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEdit
                 return;
             }
 
-            // Detect column rename and migrate configs if applicable
             if (oldRow && res.row) {
                 const rename = detectColumnRename(oldRow, res.row);
                 if (rename) {
                     migrateColumnConfigs(query, rename.oldName, rename.newName);
-                    // Also migrate the local columnCustomTypes ref so it doesn't overwrite the migration
                     if (rename.oldName in columnCustomTypes.current) {
                         columnCustomTypes.current[rename.newName] =
                             columnCustomTypes.current[rename.oldName];
@@ -81,26 +76,28 @@ export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEdit
         <>
             <dialog
                 ref={ref}
-                className="m-auto p-0 rounded-md max-w-lg text-left font-normal bg-white dark:bg-gray-800 dark:text-gray-100 backdrop:bg-black/50"
+                className="m-auto p-0 rounded-lg max-w-lg w-full text-left font-normal bg-white dark:bg-gray-800 dark:text-gray-100 backdrop:bg-black/50 shadow-xl"
                 onClick={exit}
                 onClose={exit}
             >
                 <div onClick={(e) => e.stopPropagation()}>
-                    <div className="bg-white dark:bg-gray-800 p-4 block w-full h-full">
-                        <header>
-                            <div className="flex gap-2 items-center">
-                                <form method="dialog">
-                                    <button type="submit" className="py-4 rounded-md">
-                                        <XIcon className="w-5 h-5" />
-                                    </button>
-                                </form>
-                                <h2 className="text-lg font-bold">Edit SQL</h2>
-                            </div>
+                    <div className="bg-white dark:bg-gray-800 p-5 block w-full h-full">
+                        <header className="flex gap-2 items-center mb-4">
+                            <form method="dialog">
+                                <button type="submit" className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
+                                    <XIcon className="w-5 h-5" />
+                                </button>
+                            </form>
+                            <h2 className="text-lg font-bold">Edit SQL</h2>
                         </header>
-                        <hr className="mt-2 mb-4 border-gray-200 dark:border-gray-600" />
-                        <form className="block max-w-lg" onSubmit={submit}>
-                            {output && <output>{output}</output>}
-                            <React.Suspense fallback={<></>}>
+                        <form className="block" onSubmit={submit}>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                Modify the SQL query used to generate this column's data. Changes
+                                will update how values are calculated and displayed.
+                            </p>
+                            {output && <output className="block mb-3">{output}</output>}
+                            <label className="block text-sm font-medium mb-1.5">Query</label>
+                            <React.Suspense fallback={<div className="h-32 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" />}>
                                 <CodeMirror
                                     value={valueRef.current}
                                     maxHeight="300px"
@@ -109,10 +106,10 @@ export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEdit
                                     }}
                                 />
                             </React.Suspense>
+                            <QueryHelp />
                             <ColumnCustomTypeSelector
                                 columnCustomTypes={columnCustomTypes.current}
                             />
-                            <QueryHelp />
                             <Button className="mt-4">Save Changes</Button>
                         </form>
                     </div>

@@ -18,19 +18,41 @@ const llmVendors = {
     columnExplicitlySetDataTypes: {},
 };
 
+const llmAvgInputCost = {
+    name: "Average Cost per 1K Input Tokens",
+    query: `SELECT AVG(input_token_cost * 1000) AS \`Average Cost per 1K Input Tokens\`
+    FROM models_vendors_regions
+    WHERE model_id = ?`,
+    columnExplicitlySetDataTypes: {
+        "Average Cost per 1K Input Tokens": "currency" as ColumnDataType,
+    },
+};
+
+const llmAvgOutputCost = {
+    name: "Average Cost per 1K Output Tokens",
+    query: `SELECT AVG(output_token_cost * 1000) AS \`Average Cost per 1K Output Tokens\`
+    FROM models_vendors_regions
+    WHERE model_id = ?`,
+    columnExplicitlySetDataTypes: {
+        "Average Cost per 1K Output Tokens": "currency" as ColumnDataType,
+    },
+};
+
 export const defaultQueries = [
-    singleValue("company", "Company"),
+    singleValue("company", "Brand"),
     llmVendors,
-    singleValue("selfhostable", "Self-hostable", "boolean"),
-    singleValue("reasoning", "Supports Reasoning", "boolean"),
-    singleValue("reasoning_tier", "Reasoning Tier"),
+    singleValue("release_date", "Release Date"),
     singleValue("max_input_tokens", "Max Input Tokens"),
     singleValue("max_output_tokens", "Max Output Tokens"),
     singleValue("training_cutoff", "Training Cutoff"),
-    singleValue("release_date", "Release Date"),
+    llmAvgInputCost,
+    llmAvgOutputCost,
+    singleValue("reasoning", "Supports Reasoning", "boolean"),
+    singleValue("reasoning_tier", "Reasoning Tier"),
     singleValue("humanitys_last_exam_percentage", "Humanity's Last Exam %"),
     singleValue("swe_bench_resolved_percentage", "SWE-Bench Resolved %"),
     singleValue("skatebench_score", "SkateBench Score"),
+    singleValue("selfhostable", "Self-hostable", "boolean"),
 ];
 
 // Image model default queries

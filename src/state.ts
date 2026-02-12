@@ -1,5 +1,5 @@
 import React from "react";
-import type { ColumnDataType, ColumnQuery } from "./components/Table";
+import type { ColumnQuery } from "./components/Table";
 import { defaultQueries, defaultImageQueries } from "./constants";
 
 type State = {
@@ -14,28 +14,6 @@ const initialQueries = defaultQueries.map(({ name, ...dq }) => ({
     columnOrdering: {},
     columnFilters: {},
 }));
-
-initialQueries.push({
-    columnOrdering: {},
-    columnFilters: {},
-    columnExplicitlySetDataTypes: {
-        "Average Cost per 1K Input Tokens": "currency" as ColumnDataType,
-    },
-    query: `SELECT AVG(input_token_cost * 1000) AS \`Average Cost per 1K Input Tokens\`
-    FROM models_vendors_regions
-    WHERE model_id = ?`,
-});
-
-initialQueries.push({
-    columnOrdering: {},
-    columnFilters: {},
-    columnExplicitlySetDataTypes: {
-        "Average Cost per 1K Output Tokens": "currency" as ColumnDataType,
-    },
-    query: `SELECT AVG(output_token_cost * 1000) AS \`Average Cost per 1K Output Tokens\`
-    FROM models_vendors_regions
-    WHERE model_id = ?`,
-});
 
 const initialLlmState: State = {
     currency: "USD",

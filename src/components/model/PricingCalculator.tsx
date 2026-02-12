@@ -11,11 +11,13 @@ type PricingCalculatorProps = {
 };
 
 export default function PricingCalculator({ model, vendors }: PricingCalculatorProps) {
-    const availableVendors = model.vendors.map((v) => ({
-        slug: v.vendorRef,
-        info: vendors[v.vendorRef],
-        vendorModel: v,
-    }));
+    const availableVendors = model.vendors
+        .filter((v) => Object.keys(v.regionPricing).length > 0)
+        .map((v) => ({
+            slug: v.vendorRef,
+            info: vendors[v.vendorRef],
+            vendorModel: v,
+        }));
 
     const [selectedVendorSlug, setSelectedVendorSlug] = React.useState(
         availableVendors[0]?.slug ?? ""

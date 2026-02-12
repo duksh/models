@@ -65,7 +65,7 @@ export default function ImageModelPage({ model, vendors }: ImageModelPageProps) 
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">{model.cleanName} Pricing</h2>
-                {model.vendors.map((vendorModel) => {
+                {model.vendors.filter((v) => Object.keys(v.regionPricing).length > 0).map((vendorModel) => {
                     const vendor = vendors[vendorModel.vendorRef.split(":")[0]];
                     return (
                         <div key={vendorModel.vendorRef} className="mb-6 last:mb-0">

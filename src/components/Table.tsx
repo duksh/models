@@ -440,8 +440,6 @@ function Toolbar({
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">Currency</span>
                     <CurrencyPicker modelType={modelType} />
                 </div>
-            </div>
-            <div className="flex items-center gap-1">
                 <button
                     onClick={() => clearState()}
                     className="flex items-center gap-1 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -449,6 +447,8 @@ function Toolbar({
                     <XIcon className="w-3.5 h-3.5" />
                     Clear Filters
                 </button>
+            </div>
+            <div className="flex items-center gap-1">
                 <RunQueryButton />
                 <button
                     onClick={() => setAddQueryOpen(!addQueryOpen)}

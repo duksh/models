@@ -328,7 +328,7 @@ function TableRow({
     return (
         <tr className="border-t border-gray-300 dark:border-gray-600">
             <td className="relative">
-                <div className="px-2">
+                <div className="px-2 font-roboto-mono">
                     <Link href={`/${modelPath}/${id}`}>{name}</Link>
                 </div>
                 <div className="absolute top-0 right-0 w-1 h-full bg-gray-200 dark:bg-gray-700 hover:opacity-50 transition-all duration-150" />

@@ -143,7 +143,7 @@ function TableHeader({
         >
             <div className="flex items-center mb-1 grow">
                 <div className="block grow">
-                    <div className="line-clamp-2" title={col}>
+                    <div className="line-clamp-2 font-inter-header" title={col}>
                         {col}
                     </div>
                 </div>
@@ -409,10 +409,13 @@ function NameFilter({
 }) {
     return (
         <div className="px-2 flex flex-col h-full">
-            <div className="grow">Name</div>
+            <div id="name-filter-header" className="grow flex items-center w-full justify-center font-inter-header">
+                <p>Name</p>
+            </div>
             <input
                 type="text"
                 value={nameFilter}
+                aria-label="Name Filter"
                 onChange={(e) => setNameFilter(e.target.value)}
                 className="w-full border text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-md p-1 mt-auto"
             />

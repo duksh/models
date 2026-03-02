@@ -326,7 +326,7 @@ function TableRow({
         return null;
     }
 
-    const modelPath = modelType === "llm" ? "models" : "image-models";
+    const modelPath = modelType === "llm" ? "llm-models" : "image-models";
     return (
         <tr className="border-t border-gray-300 dark:border-gray-600">
             <td className="relative">

@@ -29,7 +29,7 @@ async function loadDataDb(): Promise<Uint8Array<ArrayBuffer>> {
         return loadedDataPromise;
     }
 
-    loadedDataPromise = fetch("/data.db").then(async (res) => {
+    loadedDataPromise = fetch(`${import.meta.env.PUBLIC_BASE_URL ?? ""}/data.db`).then(async (res) => {
         if (!res.ok) {
             throw new Error(`Failed to load data.db: ${res.status} ${res.statusText}`);
         }

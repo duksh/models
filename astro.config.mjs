@@ -12,4 +12,5 @@ export default defineConfig({
   },
   prefetch: true,
   integrations: [react()],
+  base: process.env.PUBLIC_BASE_URL || undefined,
 });

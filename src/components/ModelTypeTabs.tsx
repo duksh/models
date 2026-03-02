@@ -3,7 +3,7 @@ import React from "react";
 
 const tabs: { path: string; label: string }[] = [
     { path: "/", label: "LLM" },
-    { path: "/image-gen", label: "Image Gen" },
+    { path: "/image-gen/", label: "Image Gen" },
 ];
 
 function usePath() {
@@ -24,9 +24,9 @@ export default function ModelTypeTabs() {
             {tabs.map((tab: { path: string; label: string }) => (
                 <button
                     key={tab.path}
-                    onClick={() => navigate(tab.path)}
+                    onClick={() => navigate(`${import.meta.env.PUBLIC_BASE_URL ?? ""}${tab.path}`)}
                     className={`px-4 py-1.5 rounded text-sm font-medium transition-colors ${
-                        path === tab.path
+                        path === `${import.meta.env.PUBLIC_BASE_URL ?? ""}${tab.path}`
                             ? "bg-white dark:bg-gray-800 text-[#6742d6] dark:text-purple-300"
                             : "text-white/80 hover:text-white hover:bg-[#7a52e6]"
                     }`}

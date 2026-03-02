@@ -180,7 +180,7 @@ async function tokenizeTransformers(
     if (!tokenizerRef.current) {
         const { AutoTokenizer, env } = await import("@huggingface/transformers");
         // Use our local proxy to avoid CORS issues with HuggingFace
-        env.remoteHost = "/hf/";
+        env.remoteHost = `${import.meta.env.PUBLIC_BASE_URL ?? ""}/hf/`;
         tokenizerRef.current = await AutoTokenizer.from_pretrained(pretrainedPath);
     }
 

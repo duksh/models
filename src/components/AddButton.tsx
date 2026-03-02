@@ -42,8 +42,10 @@ export default function AddButton({
                 ref={modalRef}
                 setQueries={setQueriesAndPurgeLoadedValues}
                 exit={() => {
-                    modalRef.current?.close();
-                    onClose();
+                    if (modalRef.current?.open) {
+                        modalRef.current.close();
+                        onClose();
+                    }
                 }}
                 firstId={firstId}
             />

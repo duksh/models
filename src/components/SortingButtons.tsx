@@ -13,10 +13,10 @@ export default function SortingButtons({
         <div className="top-0 mt-0.5 mr-1 inline-block dark:invert">
             <button
                 className={`${
-                    ascending === false ? "text-gray-800" : "text-gray-400"
+                    ascending === true ? "text-gray-800" : "text-gray-400"
                 } p-0 text-xs block cursor-pointer hover:text-gray-700 overflow-hidden w-4 h-3`}
                 title="Sort ascending"
-                aria-pressed={ascending === false}
+                aria-pressed={ascending === true}
                 onClick={() =>
                     setSorting(columnName, (oldValue) => {
                         if (oldValue === true) {
@@ -30,10 +30,10 @@ export default function SortingButtons({
             </button>
             <button
                 className={`${
-                    ascending === true ? "text-gray-800" : "text-gray-400"
+                    ascending === false ? "text-gray-800" : "text-gray-400"
                 } p-0 text-xs block cursor-pointer hover:text-gray-700 overflow-hidden w-4 h-3 mt-[1px]`}
                 title="Sort descending"
-                aria-pressed={ascending === true}
+                aria-pressed={ascending === false}
                 onClick={() =>
                     setSorting(columnName, (oldValue) => {
                         if (oldValue === false) {

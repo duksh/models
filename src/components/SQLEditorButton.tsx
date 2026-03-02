@@ -69,7 +69,7 @@ export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEdit
             updateQuery(true);
             exit();
         },
-        [columnCustomTypes, firstId, query]
+        [columnCustomTypes, firstId, query, updateQuery]
     );
 
     return (

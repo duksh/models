@@ -75,7 +75,7 @@ function SQLModalInner({ exit, setQueries, firstId }: SQLModalProps) {
                 exit();
             });
         },
-        [columnCustomTypes]
+        [firstId, setQueries, exit]
     );
 
     return (

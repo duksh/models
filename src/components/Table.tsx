@@ -221,7 +221,7 @@ async function loadSingleRowData(
                     const old = queryColumns[index];
                     if (JSON.stringify(old) !== JSON.stringify(sortedColumns)) {
                         queryColumns[index] = sortedColumns;
-                        setQueryColumns([...queryColumns]);
+                        if (mountedRef[0]) setQueryColumns([...queryColumns]);
                     }
                     loadedColumns[index] = sortedColumns.map((col) => row[col]);
 
@@ -234,7 +234,7 @@ async function loadSingleRowData(
                 } else if (queryColumns[index] === null) {
                     if (!queryColumns[index]) {
                         queryColumns[index] = [];
-                        setQueryColumns([...queryColumns]);
+                        if (mountedRef[0]) setQueryColumns([...queryColumns]);
                     }
                     loadedColumns[index] = [];
                 } else {

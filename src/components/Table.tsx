@@ -463,7 +463,7 @@ function Toolbar({
                     className="flex items-center gap-1 px-2 py-1.5 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
                     <XIcon className="w-3.5 h-3.5" />
-                    Clear Filters
+                    Reset Columns
                 </button>
             </div>
             <div className="flex items-center gap-1">

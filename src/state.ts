@@ -74,7 +74,7 @@ function setUrlId(id: string | null) {
 
 async function writeToRemoteStorage(state: State) {
     const u = new URL(window.location.href);
-    const type_ = u.pathname === "/" ? "llm" : "image";
+    const type_ = true; // FIXME: THIS IS A BODGE - IN THE FUTURE HANDLE PATHS PROPERLY HERE!
     const res = await fetch("https://modelskv.vantage-api.com/", {
         method: "POST",
         body: JSON.stringify({
@@ -128,7 +128,7 @@ if (typeof window !== "undefined") {
 let listenerMap: Map<string, (() => void)[]> = new Map();
 
 export function clearState() {
-    const isLlm = window.location.pathname === "/";
+    const isLlm = window.location.pathname === `${import.meta.env.PUBLIC_BASE_PATH ?? ""}/`;
     const o = isLlm ? currentLlmState : currentImageState;
     o.currency = isLlm ? initialLlmState.currency : initialImageState.currency;
     o.queries = isLlm ? initialLlmState.queries : initialImageState.queries;
@@ -149,7 +149,7 @@ export function useStateItem<Key extends keyof State>(
     key: Key,
     path: string
 ): [State[Key], (newValue: State[Key] | ((prevValue: State[Key]) => State[Key])) => void] {
-    const isLlm = path === "/";
+    const isLlm = true; // FIXME: THIS IS A BODGE - IN THE FUTURE HANDLE PATHS PROPERLY HERE!
     const currentState = isLlm ? currentLlmState : currentImageState;
     const initialState = isLlm ? initialLlmState : initialImageState;
 

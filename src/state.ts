@@ -22,7 +22,7 @@ const initialLlmState: State = {
     queries: initialQueries,
 };
 
-const currentLlmState: State = { ...initialLlmState };
+const currentLlmState: State = JSON.parse(JSON.stringify(initialLlmState));
 
 const initialImageState: State = {
     currency: "USD",
@@ -34,7 +34,7 @@ const initialImageState: State = {
         columnFilters: {},
     })),
 };
-const currentImageState: State = { ...initialImageState };
+const currentImageState: State = JSON.parse(JSON.stringify(initialImageState));
 
 try {
     const savedState = window?.localStorage ? window.localStorage.getItem("appState_llms") : null;

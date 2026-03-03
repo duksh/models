@@ -334,7 +334,7 @@ function TableRow({
         <tr className="border-t border-gray-300 dark:border-gray-600">
             <td className="relative">
                 <div className="px-2 font-roboto-mono">
-                    <Link href={`${import.meta.env.PUBLIC_BASE_URL ?? ""}/${modelPath}/${id}`}>
+                    <Link href={`${import.meta.env.PUBLIC_BASE_PATH ?? ""}/${modelPath}/${id}`}>
                         {name}
                     </Link>
                 </div>
@@ -446,12 +446,12 @@ function Toolbar({
     return (
         <div className="flex items-end justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shrink-0 gap-4">
             <div className="flex items-end gap-6">
-                <div>
+                {/* <div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
                         Output
                     </span>
                     <ModelTypeTabs />
-                </div>
+                </div> */}
                 <div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
                         Currency

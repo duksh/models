@@ -14,6 +14,6 @@ export default defineConfig({
   },
   prefetch: true,
   integrations: [react(), sitemap()],
-  site: "https://www.vantage.sh",
-  base: process.env.PUBLIC_BASE_URL || undefined,
+  site: process.env.PUBLIC_BASE_URL,
+  base: process.env.PUBLIC_BASE_PATH || undefined,
 });

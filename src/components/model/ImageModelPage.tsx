@@ -10,7 +10,7 @@ export default function ImageModelPage({ model, vendors }: ImageModelPageProps) 
     return (
         <div className="max-w-4xl mx-auto p-6">
             <div className="mb-4">
-                <Link href={`${import.meta.env.PUBLIC_BASE_URL ?? ""}/image-gen`}>
+                <Link href={`${import.meta.env.PUBLIC_BASE_PATH ?? ""}/image-gen`}>
                     &larr; Back to all image models
                 </Link>
             </div>

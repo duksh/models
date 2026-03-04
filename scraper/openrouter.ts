@@ -71,6 +71,13 @@ async function fetchOpenRouterModels(): Promise<Map<string, OpenRouterModel>> {
 // Mapping from our model IDs to OpenRouter model IDs
 const MODEL_ID_MAPPINGS: Record<string, string[]> = {
     // Anthropic
+    "claude-4-6-opus": ["anthropic/claude-opus-4.6"],
+    "claude-4-6-sonnet": ["anthropic/claude-sonnet-4.6"],
+    "claude-4-5-opus": ["anthropic/claude-opus-4.5", "anthropic/claude-4-opus"],
+    "claude-4-5-sonnet": ["anthropic/claude-sonnet-4.5"],
+    "claude-4-5-haiku": ["anthropic/claude-haiku-4.5"],
+    "claude-opus-4-6": ["anthropic/claude-opus-4.6"],
+    "claude-sonnet-4-6": ["anthropic/claude-sonnet-4.6"],
     "claude-opus-4-5": ["anthropic/claude-opus-4.5", "anthropic/claude-4-opus"],
     "claude-opus-4-1": ["anthropic/claude-opus-4.1", "anthropic/claude-4.1-opus"],
     "claude-sonnet-4-5": ["anthropic/claude-sonnet-4.5"],
@@ -133,7 +140,18 @@ function findOpenRouterModel(
     models: Map<string, OpenRouterModel>
 ): OpenRouterModel | undefined {
     // First try direct mappings
-    const mappings = MODEL_ID_MAPPINGS[modelId];
+    let mappings: string[] | undefined = MODEL_ID_MAPPINGS[modelId];
+    if (mappings) {
+        for (const mapping of mappings) {
+            const model = models.get(mapping);
+            if (model) return model;
+        }
+    }
+
+    // Then try prefix mappings for variants (e.g., "-thinking-high")
+    mappings = Object.entries(MODEL_ID_MAPPINGS)
+        .sort((a, b) => b[0].length - a[0].length)
+        .find(([prefix]) => modelId.startsWith(prefix))?.[1];
     if (mappings) {
         for (const mapping of mappings) {
             const model = models.get(mapping);

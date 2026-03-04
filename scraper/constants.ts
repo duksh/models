@@ -147,6 +147,9 @@ const MODEL_TRAINING_CUTOFFS: Record<string, string> = {
     o3: "2024-12",
     o1: "2023-10",
     // Anthropic
+    "claude-opus-4-6": "2025-08",
+    "claude-sonnet-4-6": "2026-01",
+    "claude-haiku-4-5": "2025-07",
     "claude-opus-4": "2025-03",
     "claude-sonnet-4": "2025-03",
     "claude-haiku-4": "2025-03",
@@ -199,9 +202,11 @@ const MODEL_RELEASE_DATES: Record<string, string> = {
     "o1-pro": "2024-12-05",
     o1: "2024-09-12",
     // Anthropic
+    "claude-opus-4-6": "2026-02-05",
+    "claude-sonnet-4-6": "2026-02-17",
     "claude-opus-4-5": "2025-11-01",
-    "claude-opus-4-1": "2025-05-15",
-    "claude-sonnet-4-5": "2025-06-20",
+    "claude-opus-4-1": "2025-08-05",
+    "claude-sonnet-4-5": "2025-09-29",
     "claude-sonnet-4": "2025-05-14",
     "claude-haiku-4-5": "2025-10-01",
     "claude-3-7-sonnet": "2025-02-19",
@@ -507,7 +512,7 @@ async function getHumanitysLastExamScores() {
     return res;
 }
 
-const V_NUMBER_DASH_NUMBER_REGEX = /v(\d+)-(\d+)/g;
+const NUMBER_DASH_NUMBER_REGEX = /(\d+)-(\d+)/g;
 
 export async function addBenchmarkDataForModel(modelId: string): Promise<{
     humanitysLastExamPercentage?: number;
@@ -516,8 +521,8 @@ export async function addBenchmarkDataForModel(modelId: string): Promise<{
     skatebenchScore?: number;
 }> {
     // Replace version numbers like v1-0 with v1.0 for matching
-    const dotVersion = modelId.replaceAll(V_NUMBER_DASH_NUMBER_REGEX, (_, p1, p2) => {
-        return `v${p1}.${p2}`;
+    const dotVersion = modelId.replaceAll(NUMBER_DASH_NUMBER_REGEX, (_, p1, p2) => {
+        return `${p1}.${p2}`;
     });
 
     const [skatebenchScores, sweBenchScores, hleScores] = await Promise.all([
@@ -534,8 +539,17 @@ export async function addBenchmarkDataForModel(modelId: string): Promise<{
         skatebenchCostPerTest?: number;
     } = {};
 
+    // Some Theo specific patches. Theo's stuff seems to like <number>-<thing> over <thing>-<number> for Claude.
+    let theoVersion = dotVersion;
+    if (theoVersion.startsWith("claude-")) {
+        const match = theoVersion.match(/claude(.+)-(\d+\.\d+)/);
+        if (match) {
+            theoVersion = "claude-" + match[2] + match[1];
+        }
+    }
+
     // SkateBench
-    const skatebenchEntry = skatebenchScores.find((entry) => entry.model.startsWith(dotVersion));
+    const skatebenchEntry = skatebenchScores.find((entry) => entry.model.startsWith(theoVersion));
     if (skatebenchEntry) {
         result.skatebenchScore = skatebenchEntry.successRate;
         result.skatebenchCostPerTest = skatebenchEntry.averageCostPerTest;

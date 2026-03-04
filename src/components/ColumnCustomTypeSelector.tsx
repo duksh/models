@@ -13,7 +13,7 @@ export default function ColumnCustomTypeSelector({
 }: ColumnCustomTypeSelectorProps) {
     const [columnKeys, setColumnKeys] = React.useState(() => Object.keys(columnCustomTypes));
     const [newColName, setNewColName] = React.useState("");
-    const [newColType, setNewColType] = React.useState<ColumnDataType>("boolean"));
+    const [newColType, setNewColType] = React.useState<ColumnDataType>("boolean");
     const [isAdding, setIsAdding] = React.useState(false);
 
     React.useEffect(() => {

@@ -30,10 +30,13 @@ const MODEL_NAME_OVERRIDES: Record<string, string> = {
 
 // Models to include (filter out fine-tuned, deprecated, and irrelevant models)
 const INCLUDED_MODEL_PREFIXES = [
+    "gpt-oss",
     "gpt-4o",
     "gpt-4-turbo",
     "gpt-4.1",
     "gpt-5",
+    "gpt-5.1",
+    "gpt-5.2",
     "o1",
     "o3",
     "o4",

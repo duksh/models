@@ -34,16 +34,13 @@ const otherCurrencies = allCurrencies
     .sort(([codeA], [codeB]) => codeA.toUpperCase().localeCompare(codeB.toUpperCase()));
 
 export default function CurrencyPicker({
-    modelType,
+    isLlm,
     className,
 }: {
-    modelType: "llm" | "image";
+    isLlm: boolean;
     className?: string;
 }) {
-    const [currency, setCurrency] = useStateItem(
-        "currency",
-        modelType === "llm" ? "/" : "/image-models"
-    );
+    const [currency, setCurrency] = useStateItem("currency", isLlm);
     const [open, setOpen] = React.useState(false);
 
     const selectedCurrency = allCurrencies.find(([code]) => code === currency);

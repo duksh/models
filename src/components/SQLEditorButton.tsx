@@ -8,10 +8,16 @@ import { loadSingleRow } from "../sqlEngine";
 import { detectColumnRename, migrateColumnConfigs } from "./utils/migrateColumnConfigs";
 import QueryHelp from "./QueryHelp";
 
+// Keep the alias for any external consumers.
+export type ColumnQueryPartial = ColumnQuery;
+
 type SQLEditorButtonProps = {
     query: ColumnQuery;
     firstId: string;
-    updateQuery: (rerunQuery: boolean) => void;
+    updateQuery: (
+        query: string,
+        columnExplicitlySetDataTypes: Record<string, ColumnDataType>
+    ) => void;
 };
 
 export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEditorButtonProps) {
@@ -66,10 +72,10 @@ export default function SQLEditorButton({ query, firstId, updateQuery }: SQLEdit
             query.columnExplicitlySetDataTypes = {
                 ...columnCustomTypes.current,
             };
-            updateQuery(true);
+            updateQuery(query.query, query.columnExplicitlySetDataTypes);
             exit();
         },
-        [columnCustomTypes, firstId, query, updateQuery]
+        [columnCustomTypes, firstId, query, updateQuery, exit]
     );
 
     return (

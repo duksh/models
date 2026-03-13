@@ -154,9 +154,8 @@ export function clearState() {
 
 export function useStateItem<Key extends keyof State>(
     key: Key,
-    path: string
+    isLlm: boolean
 ): [State[Key], (newValue: State[Key] | ((prevValue: State[Key]) => State[Key])) => void] {
-    const isLlm = !END_IS_IMAGE_PATH.test(path);
     const currentState = isLlm ? currentLlmState : currentImageState;
     const initialState = isLlm ? initialLlmState : initialImageState;
 
@@ -168,7 +167,10 @@ export function useStateItem<Key extends keyof State>(
             } else {
                 currentState[key] = newValue;
             }
-            window?.localStorage?.setItem("appState", JSON.stringify(currentState));
+            window?.localStorage?.setItem(
+                `appState_${isLlm ? "llms" : "images"}`,
+                JSON.stringify(currentState)
+            );
             doDebounce(() => {
                 writeToRemoteStorage(currentState);
             }, 500);
@@ -177,7 +179,7 @@ export function useStateItem<Key extends keyof State>(
                 listeners.forEach((listener) => listener());
             }
         },
-        [key]
+        [key, isLlm]
     );
 
     const getter = React.useSyncExternalStore(
